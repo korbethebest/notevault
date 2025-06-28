@@ -1,1 +1,1 @@
-export { default as ThemeToggleButton } from "./ThemeToggleButton";
+export { default as Modal } from "./Modal";

@@ -1,21 +1,27 @@
-import { useRouter } from 'next/router';
+"use client";
+
+import { useRouter } from "next/navigation";
+
 import { supabase } from "@/shared/lib";
 
 function useLogin() {
-  const router = useRouter();
+	const router = useRouter();
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+	const login = async (email: string, password: string) => {
+		const { error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
 
-    if (error) {
-      return { error };
-    } else {
-      router.push('/');
-      return { error: null };
-    }
-  }
+		if (error) {
+			return { error };
+		} else {
+			router.push("/");
+			return { error: null };
+		}
+	};
 
-  return { login };
+	return { login };
 }
 
 export default useLogin;

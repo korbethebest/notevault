@@ -3,67 +3,59 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabase, useModal } from "@/shared";
-import { useLogin } from "../model";
+import { useModal } from "@/shared";
+import { useSignUp } from "../model";
 
-function LoginForm() {
+function SignUpForm() {
 	const router = useRouter();
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const { login } = useLogin();
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [nickname, setNickname] = useState("");
+	const { signUp } = useSignUp();
 	const { openModal } = useModal();
 
-	const handleLogin = async () => {
-		const { error } = await login(email, password);
+	const handleSignUp = async () => {
+		if (password !== confirmPassword) {
+			openModal({
+				type: "error",
+				title: "비밀번호 불일치",
+				message: "비밀번호가 일치하지 않습니다.",
+				confirmText: "확인",
+			});
+			return;
+		}
 
-		if (error) {
-			// 이메일 확인이 필요한 경우 특별 처리
-			if (error.message.includes("Email not confirmed")) {
-				openModal({
-					type: "warning",
-					title: "이메일 확인 필요",
-					message:
-						"계정을 활성화하려면 이메일 확인이 필요합니다. 이메일을 확인해주세요.",
-					confirmText: "확인",
-					cancelText: "재전송",
-					onCancel: async () => {
-						// 확인 이메일 재전송 로직
-						const { error } = await supabase.auth.resend({
-							type: "signup",
-							email,
-						});
+		const result = await signUp(email, password, nickname);
 
-						if (error) {
-							openModal({
-								type: "error",
-								title: "이메일 재전송 실패",
-								message: error.message,
-								confirmText: "확인",
-							});
-						} else {
-							openModal({
-								type: "success",
-								title: "이메일 재전송 성공",
-								message:
-									"확인 이메일이 재전송되었습니다. 이메일을 확인해주세요.",
-								confirmText: "확인",
-							});
-						}
-					},
-				});
-			} else {
-				// 다른 오류 처리
-				openModal({
-					type: "error",
-					title: "로그인 오류",
-					message: error.message,
-					confirmText: "확인",
-				});
-			}
+		if (result.error) {
+			openModal({
+				type: "error",
+				title: "회원가입 오류",
+				message: result.error.message,
+				confirmText: "확인",
+			});
+		} else if (result.emailConfirmationRequired) {
+			// 이메일 인증이 필요한 경우
+			openModal({
+				type: "success",
+				title: "회원가입 성공",
+				message:
+					"회원가입이 완료되었습니다. 이메일로 전송된 확인 링크를 클릭하여 계정을 활성화해주세요.",
+				confirmText: "확인",
+			});
 		} else {
-			// 로그인 성공 처리
-			router.push("/");
+			// 이메일 인증이 필요 없는 경우
+			openModal({
+				type: "success",
+				title: "회원가입 성공",
+				message: "회원가입이 완료되었습니다.",
+				confirmText: "로그인 페이지로 이동",
+				onConfirm: () => {
+					router.push("/login");
+				},
+			});
 		}
 	};
 
@@ -92,7 +84,7 @@ function LoginForm() {
 			</div>
 
 			<div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800 w-full max-w-md">
-				<h2 className="text-2xl font-semibold mb-6 text-center">로그인</h2>
+				<h2 className="text-2xl font-semibold mb-6 text-center">회원가입</h2>
 
 				<div className="space-y-4">
 					<div className="space-y-2">
@@ -114,6 +106,23 @@ function LoginForm() {
 
 					<div className="space-y-2">
 						<label
+							htmlFor="nickname"
+							className="block text-sm font-medium text-gray-300"
+						>
+							닉네임
+						</label>
+						<input
+							id="nickname"
+							type="text"
+							value={nickname}
+							onChange={(e) => setNickname(e.target.value)}
+							placeholder="닉네임을 입력하세요"
+							className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:border-transparent text-white"
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<label
 							htmlFor="password"
 							className="block text-sm font-medium text-gray-300"
 						>
@@ -129,17 +138,34 @@ function LoginForm() {
 						/>
 					</div>
 
+					<div className="space-y-2">
+						<label
+							htmlFor="confirmPassword"
+							className="block text-sm font-medium text-gray-300"
+						>
+							비밀번호 확인
+						</label>
+						<input
+							id="confirmPassword"
+							type="password"
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+							placeholder="비밀번호를 다시 입력하세요"
+							className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1DB954] focus:border-transparent text-white"
+						/>
+					</div>
+
 					<button
-						onClick={handleLogin}
+						onClick={handleSignUp}
 						className="w-full rounded-md transition-colors flex items-center justify-center bg-[#1DB954] text-black gap-2 hover:bg-[#1ed760] font-medium text-base h-12 px-6 mt-6"
 					>
-						로그인
+						회원가입
 					</button>
 
 					<div className="mt-4 text-center text-sm text-gray-400">
-						<span>계정이 없으신가요? </span>
-						<Link href="/signup" className="text-[#1DB954] hover:underline">
-							회원가입
+						<span>이미 계정이 있으신가요? </span>
+						<Link href="/login" className="text-[#1DB954] hover:underline">
+							로그인
 						</Link>
 					</div>
 				</div>
@@ -152,4 +178,4 @@ function LoginForm() {
 	);
 }
 
-export default LoginForm;
+export default SignUpForm;
