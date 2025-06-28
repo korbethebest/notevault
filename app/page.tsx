@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -33,9 +32,7 @@ export default function Home() {
 				</div>
 
 				<div className="bg-zinc-900 p-8 rounded-xl border border-zinc-800 w-full">
-					<h2 className="text-xl font-semibold mb-4">
-						NoteVault에서 할 수 있는 것
-					</h2>
+					<h2 className="text-xl font-semibold mb-4">NoteVault에서 할 수 있는 것</h2>
 					<ul className="list-inside space-y-3 text-left">
 						<li className="flex items-start gap-3">
 							<div className="bg-[#1DB954] p-1 rounded-md mt-0.5">

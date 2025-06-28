@@ -6,9 +6,7 @@
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
-		"format": "biome format --write ./src",
-		"lint": "biome lint ./src",
-		"check": "biome check ./src"
+		"check": "biome check ./app ./widgets ./features ./shared"
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.50.2",

@@ -87,7 +87,6 @@ const Modal: React.FC<ModalProps> = ({
 						</svg>
 					</div>
 				);
-			case "info":
 			default:
 				return (
 					<div className="bg-[#1DB95420] rounded-full p-2">
@@ -118,9 +117,7 @@ const Modal: React.FC<ModalProps> = ({
 				<div className="flex items-start mb-4">
 					{getIconByType()}
 					<div className="ml-4 flex-1">
-						{title && (
-							<h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-						)}
+						{title && <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>}
 						<p className="text-gray-300">{message}</p>
 					</div>
 				</div>

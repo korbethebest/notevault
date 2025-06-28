@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import { supabase, useModal } from "@/shared";
 import { useLogin } from "../model";
 
@@ -23,8 +24,7 @@ function LoginForm() {
 				openModal({
 					type: "warning",
 					title: "이메일 확인 필요",
-					message:
-						"계정을 활성화하려면 이메일 확인이 필요합니다. 이메일을 확인해주세요.",
+					message: "계정을 활성화하려면 이메일 확인이 필요합니다. 이메일을 확인해주세요.",
 					confirmText: "확인",
 					cancelText: "재전송",
 					onCancel: async () => {
@@ -45,8 +45,7 @@ function LoginForm() {
 							openModal({
 								type: "success",
 								title: "이메일 재전송 성공",
-								message:
-									"확인 이메일이 재전송되었습니다. 이메일을 확인해주세요.",
+								message: "확인 이메일이 재전송되었습니다. 이메일을 확인해주세요.",
 								confirmText: "확인",
 							});
 						}
@@ -96,10 +95,7 @@ function LoginForm() {
 
 				<div className="space-y-4">
 					<div className="space-y-2">
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="email" className="block text-sm font-medium text-gray-300">
 							이메일
 						</label>
 						<input
@@ -113,10 +109,7 @@ function LoginForm() {
 					</div>
 
 					<div className="space-y-2">
-						<label
-							htmlFor="password"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="password" className="block text-sm font-medium text-gray-300">
 							비밀번호
 						</label>
 						<input

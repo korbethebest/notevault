@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import { useModal } from "@/shared";
 import { useSignUp } from "../model";
 
@@ -88,10 +89,7 @@ function SignUpForm() {
 
 				<div className="space-y-4">
 					<div className="space-y-2">
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="email" className="block text-sm font-medium text-gray-300">
 							이메일
 						</label>
 						<input
@@ -105,10 +103,7 @@ function SignUpForm() {
 					</div>
 
 					<div className="space-y-2">
-						<label
-							htmlFor="nickname"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="nickname" className="block text-sm font-medium text-gray-300">
 							닉네임
 						</label>
 						<input
@@ -122,10 +117,7 @@ function SignUpForm() {
 					</div>
 
 					<div className="space-y-2">
-						<label
-							htmlFor="password"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="password" className="block text-sm font-medium text-gray-300">
 							비밀번호
 						</label>
 						<input
@@ -139,10 +131,7 @@ function SignUpForm() {
 					</div>
 
 					<div className="space-y-2">
-						<label
-							htmlFor="confirmPassword"
-							className="block text-sm font-medium text-gray-300"
-						>
+						<label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
 							비밀번호 확인
 						</label>
 						<input
