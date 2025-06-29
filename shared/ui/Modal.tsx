@@ -1,26 +1,10 @@
 "use client";
 
-type ModalProps = {
-	isOpen: boolean;
-	title?: string;
-	message: string;
-	confirmText?: string;
-	cancelText?: string;
-	onConfirm?: () => void;
-	onCancel?: () => void;
-	type?: "info" | "success" | "warning" | "error";
-};
+import { useModal } from "../model";
 
-const Modal: React.FC<ModalProps> = ({
-	isOpen,
-	title,
-	message,
-	confirmText = "확인",
-	cancelText = "취소",
-	onConfirm,
-	onCancel,
-	type = "info",
-}) => {
+const Modal: React.FC = () => {
+	const { modal, confirm, cancel } = useModal();
+	const { isOpen, title, message, confirmText, cancelText, onCancel, type } = modal;
 	if (!isOpen) return null;
 
 	const getIconByType = () => {
@@ -125,14 +109,14 @@ const Modal: React.FC<ModalProps> = ({
 				<div className="flex justify-end gap-3 mt-6">
 					{onCancel && (
 						<button
-							onClick={onCancel}
+							onClick={cancel}
 							className="px-4 py-2 border border-zinc-700 text-white rounded-md hover:bg-zinc-800 transition-colors"
 						>
 							{cancelText}
 						</button>
 					)}
 					<button
-						onClick={onConfirm}
+						onClick={confirm}
 						className="px-4 py-2 bg-[#1DB954] text-black rounded-md hover:bg-[#1ed760] transition-colors font-medium"
 					>
 						{confirmText}

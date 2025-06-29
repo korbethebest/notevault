@@ -14,10 +14,22 @@ function SignUpForm() {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [nickname, setNickname] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 	const { signUp } = useSignUp();
 	const { openModal } = useModal();
 
 	const handleSignUp = async () => {
+		// 입력 필드 검증
+		if (!email || !password || !confirmPassword || !nickname) {
+			openModal({
+				type: "warning",
+				title: "입력 오류",
+				message: "모든 필드를 입력해주세요.",
+				confirmText: "확인",
+			});
+			return;
+		}
+
 		if (password !== confirmPassword) {
 			openModal({
 				type: "error",
@@ -28,35 +40,52 @@ function SignUpForm() {
 			return;
 		}
 
-		const result = await signUp(email, password, nickname);
+		try {
+			setIsLoading(true); // 로딩 시작
 
-		if (result.error) {
+			const result = await signUp(email, password, nickname);
+
+			if (result.error) {
+				if (result.emailConfirmationRequired) {
+					openModal({
+						type: "success",
+						title: "회원가입 성공",
+						message:
+							"회원가입이 완료되었습니다. 이메일로 전송된 확인 링크를 클릭하여 계정을 활성화해주세요.",
+						confirmText: "확인",
+						onConfirm: () => {
+							router.push("/login");
+						},
+					});
+					return;
+				}
+				openModal({
+					type: "error",
+					title: "회원가입 오류",
+					message: result.error.message,
+					confirmText: "확인",
+				});
+			} else {
+				openModal({
+					type: "success",
+					title: "회원가입 성공",
+					message: "회원가입이 완료되었습니다.",
+					confirmText: "로그인 페이지로 이동",
+					onConfirm: () => {
+						router.push("/login");
+					},
+				});
+			}
+		} catch (error) {
+			console.error("회원가입 처리 중 예외 발생:", error);
 			openModal({
 				type: "error",
-				title: "회원가입 오류",
-				message: result.error.message,
+				title: "시스템 오류",
+				message: "회원가입 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 				confirmText: "확인",
 			});
-		} else if (result.emailConfirmationRequired) {
-			// 이메일 인증이 필요한 경우
-			openModal({
-				type: "success",
-				title: "회원가입 성공",
-				message:
-					"회원가입이 완료되었습니다. 이메일로 전송된 확인 링크를 클릭하여 계정을 활성화해주세요.",
-				confirmText: "확인",
-			});
-		} else {
-			// 이메일 인증이 필요 없는 경우
-			openModal({
-				type: "success",
-				title: "회원가입 성공",
-				message: "회원가입이 완료되었습니다.",
-				confirmText: "로그인 페이지로 이동",
-				onConfirm: () => {
-					router.push("/login");
-				},
-			});
+		} finally {
+			setIsLoading(false); // 로딩 종료
 		}
 	};
 
@@ -146,9 +175,36 @@ function SignUpForm() {
 
 					<button
 						onClick={handleSignUp}
-						className="w-full rounded-md transition-colors flex items-center justify-center bg-[#1DB954] text-black gap-2 hover:bg-[#1ed760] font-medium text-base h-12 px-6 mt-6"
+						disabled={isLoading}
+						className={`w-full rounded-md transition-colors flex items-center justify-center ${isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-[#1DB954] hover:bg-[#1ed760]"} text-black gap-2 font-medium text-base h-12 px-6 mt-6`}
 					>
-						회원가입
+						{isLoading ? (
+							<>
+								<svg
+									className="animate-spin -ml-1 mr-2 h-5 w-5 text-black"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<circle
+										className="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										strokeWidth="4"
+									></circle>
+									<path
+										className="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									></path>
+								</svg>
+								처리 중...
+							</>
+						) : (
+							"회원가입"
+						)}
 					</button>
 
 					<div className="mt-4 text-center text-sm text-gray-400">

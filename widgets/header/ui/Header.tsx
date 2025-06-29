@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { supabase } from "@/shared/lib";
 
@@ -10,6 +10,37 @@ function Header() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [nickname, setNickname] = useState<string>("");
+
+	useEffect(() => {
+		const fetchUserProfile = async () => {
+			try {
+				// 현재 로그인된 사용자 정보 가져오기
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+
+				if (user) {
+					// User 테이블에서 닉네임 정보 가져오기
+					const { data, error } = await supabase
+						.from("User")
+						.select("nickname")
+						.eq("id", user.id)
+						.single();
+
+					if (data && !error) {
+						setNickname(data.nickname);
+					} else {
+						console.error("사용자 프로필 정보를 가져오는 중 오류 발생:", error);
+					}
+				}
+			} catch (error) {
+				console.error("사용자 정보 조회 중 예외 발생:", error);
+			}
+		};
+
+		fetchUserProfile();
+	}, []);
 
 	const handleLogout = async () => {
 		try {
@@ -96,6 +127,11 @@ function Header() {
 
 					{/* 데스크탑 메뉴 */}
 					<div className="hidden md:flex md:items-center md:space-x-4">
+						{nickname && (
+							<div className="ml-4 text-sm text-gray-300">
+								환영합니다 <span className="text-[#1DB954] font-medium">{nickname}</span>님!
+							</div>
+						)}
 						<Link
 							href="/profile"
 							className="text-gray-300 hover:text-[#1DB954] px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
