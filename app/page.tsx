@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { SpotifyCharts } from "@/features/charts";
+
 export default function Home() {
 	return (
 		<div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -130,6 +132,12 @@ export default function Home() {
 					</Link>
 				</div>
 			</main>
+
+			{/* Spotify Charts Section */}
+			<section className="w-full max-w-6xl mt-16">
+				<SpotifyCharts />
+			</section>
+
 			<footer className="mt-16 flex gap-[24px] flex-wrap items-center justify-center text-zinc-400">
 				<Link
 					className="flex items-center gap-2 hover:text-[#1DB954] transition-colors"
