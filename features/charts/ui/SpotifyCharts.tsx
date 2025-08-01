@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 
+import type { SpotifyTrack } from "@/entities/track";
 import { useSpotifyCharts } from "../hooks";
-import type { SpotifyTrack } from "../types";
 
 type TrackItemProps = {
 	track: SpotifyTrack;

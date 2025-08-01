@@ -1,6 +1,9 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
-import type { ChartData, SpotifyTrack } from "../types";
+import type { SpotifyTrack } from "@/entities/track";
+import type { ChartData } from "../types";
 
 const useSpotifyCharts = () => {
 	const [charts, setCharts] = useState<SpotifyTrack[]>([]);
