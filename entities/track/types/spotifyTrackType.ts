@@ -11,9 +11,12 @@ export type SpotifyTrack = {
 			height: number;
 			width: number;
 		}>;
+		release_date?: string;
 	};
 	external_urls: {
 		spotify: string;
 	};
 	preview_url: string | null;
+	duration_ms?: number;
+	popularity?: number;
 };
