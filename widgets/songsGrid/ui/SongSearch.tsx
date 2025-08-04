@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
+import { LoadingSkeleton, SongCard } from "@/entities/track";
 import { useSpotifySearch } from "../hooks";
-import SongSearchCard from "./SongSearchCard";
-import SongSearchLoadingSkeleton from "./SongSearchLoadingSkeleton";
 
 function SongSearch() {
 	const [searchQuery, setSearchQuery] = useState("");
@@ -138,10 +136,10 @@ function SongSearch() {
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
 							{loading
 								? Array.from({ length: 10 }, (_, i) => `search-loading-${i}-${Date.now()}`).map(
-										(key) => <SongSearchLoadingSkeleton key={key} />,
+										(key) => <LoadingSkeleton key={key} />,
 									)
 								: searchResults.map((track, index) => (
-										<SongSearchCard key={track.id} track={track} rank={index + 1} />
+										<SongCard key={track.id} track={track} rank={index + 1} />
 									))}
 						</div>
 					</div>

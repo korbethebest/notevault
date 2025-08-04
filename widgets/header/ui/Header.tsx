@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { supabase } from "@/shared/lib";
+import { supabase } from "@/shared";
 
 function Header() {
 	const router = useRouter();
@@ -68,7 +68,7 @@ function Header() {
 				<div className="flex justify-between items-center h-16">
 					{/* 로고 영역 */}
 					<div className="flex items-center">
-						<Link href="/songs" className="flex items-center gap-2">
+						<Link href="/" className="flex items-center gap-2">
 							<div className="bg-[#1DB954] w-8 h-8 rounded-full flex items-center justify-center">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
