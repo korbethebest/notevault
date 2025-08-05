@@ -11,15 +11,18 @@ function Header() {
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [nickname, setNickname] = useState<string>("");
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
 	useEffect(() => {
-		const fetchUserProfile = async () => {
+		const checkAuthAndFetchProfile = async () => {
 			try {
 				const {
 					data: { user },
 				} = await supabase.auth.getUser();
 
 				if (user) {
+					setIsAuthenticated(true);
+
 					const { data, error } = await supabase
 						.from("User")
 						.select("nickname")
@@ -29,16 +32,26 @@ function Header() {
 					if (data && !error && data.nickname) {
 						setNickname(data.nickname);
 					} else {
-						const fallbackNickname = user.user_metadata?.nickname || user.email?.split("@")[0] || "사용자";
+						const fallbackNickname =
+							user.user_metadata?.nickname || user.email?.split("@")[0] || "사용자";
 						setNickname(fallbackNickname);
+					}
+				} else {
+					setIsAuthenticated(false);
+					if (pathname !== "/login" && pathname !== "/signup") {
+						router.push("/login");
 					}
 				}
 			} catch (error) {
 				console.error("사용자 정보 조회 중 예외 발생:", error);
+				setIsAuthenticated(false);
+				if (pathname !== "/login" && pathname !== "/signup") {
+					router.push("/login");
+				}
 			}
 		};
 
-		fetchUserProfile();
+		checkAuthAndFetchProfile();
 	}, []);
 
 	const handleLogout = async () => {
@@ -56,7 +69,13 @@ function Header() {
 		}
 	};
 
+	// 로그인/회원가입 페이지에서는 헤더 숨김
 	if (pathname === "/login" || pathname === "/signup") {
+		return null;
+	}
+
+	// 인증 상태 확인 중이거나 미인증 상태면 헤더 숨김
+	if (isAuthenticated === null || isAuthenticated === false) {
 		return null;
 	}
 
