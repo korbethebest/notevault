@@ -1,15 +1,26 @@
 import type { User } from "@supabase/supabase-js";
 import { useState } from "react";
 
+import type { SpotifyTrack } from "@/entities/track";
 import type { WikiData } from "../types";
 
 interface UseWikiEditorProps {
 	wikiData: WikiData | null;
-	saveWikiData: (content: string, currentUser: User | null) => Promise<boolean>;
+	saveWikiData: (
+		content: string,
+		currentUser: User | null,
+		trackData?: SpotifyTrack | null,
+	) => Promise<boolean>;
 	currentUser: User | null;
+	trackData?: SpotifyTrack | null;
 }
 
-export function useWikiEditor({ wikiData, saveWikiData, currentUser }: UseWikiEditorProps) {
+export function useWikiEditor({
+	wikiData,
+	saveWikiData,
+	currentUser,
+	trackData,
+}: UseWikiEditorProps) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [editContent, setEditContent] = useState("");
 	const [saving, setSaving] = useState(false);
@@ -30,7 +41,7 @@ export function useWikiEditor({ wikiData, saveWikiData, currentUser }: UseWikiEd
 	const handleSave = async () => {
 		setSaving(true);
 		try {
-			const success = await saveWikiData(editContent, currentUser);
+			const success = await saveWikiData(editContent, currentUser, trackData);
 			if (success) {
 				setIsEditing(false);
 			} else {

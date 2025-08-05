@@ -1,5 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 
 import type { SpotifyTrack } from "@/entities/track";
@@ -21,8 +23,62 @@ export function WikiContent({
 }: WikiContentProps) {
 	if (wikiData?.content) {
 		return (
-			<div className="prose prose-invert max-w-none bg-zinc-900 rounded-xl p-6">
-				<ReactMarkdown remarkPlugins={[remarkGfm]}>{wikiData.content}</ReactMarkdown>
+			<div className="prose prose-invert prose-lg max-w-none bg-zinc-900 rounded-xl p-6">
+				<ReactMarkdown
+					remarkPlugins={[remarkGfm]}
+					rehypePlugins={[rehypeRaw, rehypeSanitize]}
+					components={{
+						h1: ({ children }) => (
+							<h1 className="text-3xl font-bold text-white mb-4 border-b border-zinc-700 pb-2">
+								{children}
+							</h1>
+						),
+						h2: ({ children }) => (
+							<h2 className="text-2xl font-semibold text-white mb-3 mt-6">{children}</h2>
+						),
+						h3: ({ children }) => (
+							<h3 className="text-xl font-medium text-white mb-2 mt-4">{children}</h3>
+						),
+						p: ({ children }) => <p className="text-zinc-300 mb-3 leading-relaxed">{children}</p>,
+						ul: ({ children }) => (
+							<ul className="text-zinc-300 mb-3 list-disc list-inside space-y-1">{children}</ul>
+						),
+						ol: ({ children }) => (
+							<ol className="text-zinc-300 mb-3 list-decimal list-inside space-y-1">{children}</ol>
+						),
+						li: ({ children }) => <li className="text-zinc-300">{children}</li>,
+						blockquote: ({ children }) => (
+							<blockquote className="border-l-4 border-[#1DB954] pl-4 italic text-zinc-400 my-4">
+								{children}
+							</blockquote>
+						),
+						code: ({ children }) => (
+							<code className="bg-zinc-800 text-[#1DB954] px-1 py-0.5 rounded text-sm">
+								{children}
+							</code>
+						),
+						pre: ({ children }) => (
+							<pre className="bg-zinc-800 p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>
+						),
+						strong: ({ children }) => (
+							<strong className="text-white font-semibold">{children}</strong>
+						),
+						em: ({ children }) => <em className="text-zinc-300 italic">{children}</em>,
+						hr: () => <hr className="border-zinc-700 my-6" />,
+						a: ({ href, children }) => (
+							<a
+								href={href}
+								className="text-[#1DB954] hover:text-[#1ed760] underline"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{children}
+							</a>
+						),
+					}}
+				>
+					{wikiData.content}
+				</ReactMarkdown>
 			</div>
 		);
 	}

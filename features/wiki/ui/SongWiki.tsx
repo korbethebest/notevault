@@ -27,7 +27,7 @@ function SongWiki({ songId }: SongWikiProps) {
 		handleEdit,
 		handleSave,
 		handleCancel,
-	} = useWikiEditor({ wikiData, saveWikiData, currentUser });
+	} = useWikiEditor({ wikiData, saveWikiData, currentUser, trackData });
 
 	return (
 		<div className="min-h-screen bg-black text-white">
@@ -83,7 +83,12 @@ function SongWiki({ songId }: SongWikiProps) {
 								</div>
 								<button
 									onClick={handleEdit}
-									className="px-4 py-2 text-sm bg-[#1DB954] text-black rounded-lg hover:bg-[#1ed760] transition-colors"
+									disabled={!wikiData}
+									className={`px-4 py-2 text-sm rounded-lg transition-colors ${
+										wikiData
+											? "bg-[#1DB954] text-black hover:bg-[#1ed760]"
+											: "bg-zinc-600 text-zinc-400 cursor-not-allowed"
+									}`}
 								>
 									편집
 								</button>

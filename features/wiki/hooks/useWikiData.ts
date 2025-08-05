@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-
+import type { SpotifyTrack } from "@/entities/track";
 import { supabase } from "@/shared";
 import type { WikiDataWithNickname } from "../types";
 
@@ -11,9 +11,14 @@ type SupabaseWikiResponse = {
 	content: string;
 	created_at: string;
 	updated_at: string;
-	User: {
-		nickname: string;
-	}[];
+	User:
+		| {
+				nickname: string;
+		  }[]
+		| {
+				nickname: string;
+		  }
+		| null;
 };
 
 export function useWikiData(songId: string) {
@@ -46,6 +51,16 @@ export function useWikiData(songId: string) {
 				setError("위키 데이터를 불러올 수 없습니다");
 			} else if (data) {
 				const supabaseData = data as SupabaseWikiResponse;
+
+				let nickname = "알 수 없음";
+				if (supabaseData.User) {
+					if (Array.isArray(supabaseData.User) && supabaseData.User.length > 0) {
+						nickname = supabaseData.User[0]?.nickname || "알 수 없음";
+					} else if (!Array.isArray(supabaseData.User) && "nickname" in supabaseData.User) {
+						nickname = supabaseData.User.nickname || "알 수 없음";
+					}
+				}
+
 				const typedData: WikiDataWithNickname = {
 					id: supabaseData.id,
 					song_id: supabaseData.song_id,
@@ -53,7 +68,7 @@ export function useWikiData(songId: string) {
 					content: supabaseData.content,
 					created_at: supabaseData.created_at,
 					updated_at: supabaseData.updated_at,
-					nickname: supabaseData.User?.[0]?.nickname || "알 수 없음",
+					nickname: nickname,
 				};
 				setWikiData(typedData);
 			} else {
@@ -71,7 +86,11 @@ export function useWikiData(songId: string) {
 		fetchWikiData();
 	}, [songId]);
 
-	const saveWikiData = async (content: string, currentUser: User | null): Promise<boolean> => {
+	const saveWikiData = async (
+		content: string,
+		currentUser: User | null,
+		trackData?: SpotifyTrack | null,
+	): Promise<boolean> => {
 		if (!currentUser || !songId) return false;
 
 		try {
@@ -86,13 +105,32 @@ export function useWikiData(songId: string) {
 
 				if (error) throw error;
 			} else {
+				const songData = {
+					id: songId,
+					title: trackData?.name || "Unknown Title",
+					artist: trackData?.artists.map((artist) => artist.name).join(", ") || "Unknown Artist",
+					album: trackData?.album.name || null,
+					release_date: trackData?.album.release_date || null,
+					cover_image_url: trackData?.album.images[0]?.url || null,
+				};
+
+				const { error: songUpsertError } = await supabase
+					.from("Song")
+					.upsert(songData, { onConflict: "id" });
+
+				if (songUpsertError) {
+					throw songUpsertError;
+				}
+
 				const { error } = await supabase.from("SongWiki").insert({
 					song_id: songId,
 					created_by: currentUser.id,
 					content,
 				});
 
-				if (error) throw error;
+				if (error) {
+					throw error;
+				}
 			}
 
 			await fetchWikiData();
