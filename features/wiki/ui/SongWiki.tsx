@@ -76,7 +76,7 @@ function SongWiki({ songId }: SongWikiProps) {
 								<div className="text-sm text-zinc-400">
 									{wikiData && (
 										<>
-											마지막 편집: {wikiData.user_nickname} •{" "}
+											마지막 편집: {wikiData.nickname} •{" "}
 											{new Date(wikiData.updated_at).toLocaleDateString("ko-KR")}
 										</>
 									)}

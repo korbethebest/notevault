@@ -1,9 +1,10 @@
+import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/shared";
 
 export function useCurrentUser() {
-	const [currentUser, setCurrentUser] = useState<any>(null);
+	const [currentUser, setCurrentUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -22,7 +23,6 @@ export function useCurrentUser() {
 
 		getCurrentUser();
 
-		// 인증 상태 변경 감지
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {

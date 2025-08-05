@@ -1,1 +1,1 @@
-export type { TrackDisplayInfo, WikiData } from "./wikiType";
+export type { TrackDisplayInfo, WikiData, WikiDataWithNickname } from "./wikiType";

@@ -1,10 +1,23 @@
+import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 import { supabase } from "@/shared";
-import type { WikiData } from "../types";
+import type { WikiDataWithNickname } from "../types";
+
+type SupabaseWikiResponse = {
+	id: string;
+	song_id: string;
+	created_by: string;
+	content: string;
+	created_at: string;
+	updated_at: string;
+	User: {
+		nickname: string;
+	}[];
+};
 
 export function useWikiData(songId: string) {
-	const [wikiData, setWikiData] = useState<WikiData | null>(null);
+	const [wikiData, setWikiData] = useState<WikiDataWithNickname | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -19,13 +32,8 @@ export function useWikiData(songId: string) {
 				.from("SongWiki")
 				.select(
 					`
-						id,
-						song_id,
-						created_by,
-						content,
-						created_at,
-						updated_at,
-						User!inner(nickname)
+						*,
+						User!created_by(nickname)
 					`,
 				)
 				.eq("song_id", songId)
@@ -37,13 +45,18 @@ export function useWikiData(songId: string) {
 				console.error("위키 데이터 조회 오류:", supabaseError);
 				setError("위키 데이터를 불러올 수 없습니다");
 			} else if (data) {
-				const wikiWithNickname = {
-					...data,
-					user_nickname: (data.User as any)?.nickname || "알 수 없음",
+				const supabaseData = data as SupabaseWikiResponse;
+				const typedData: WikiDataWithNickname = {
+					id: supabaseData.id,
+					song_id: supabaseData.song_id,
+					created_by: supabaseData.created_by,
+					content: supabaseData.content,
+					created_at: supabaseData.created_at,
+					updated_at: supabaseData.updated_at,
+					nickname: supabaseData.User?.[0]?.nickname || "알 수 없음",
 				};
-				setWikiData(wikiWithNickname);
+				setWikiData(typedData);
 			} else {
-				// 위키 데이터가 없으면 null로 설정
 				setWikiData(null);
 			}
 		} catch (error) {
@@ -58,12 +71,11 @@ export function useWikiData(songId: string) {
 		fetchWikiData();
 	}, [songId]);
 
-	const saveWikiData = async (content: string, currentUser: any): Promise<boolean> => {
+	const saveWikiData = async (content: string, currentUser: User | null): Promise<boolean> => {
 		if (!currentUser || !songId) return false;
 
 		try {
 			if (wikiData) {
-				// 기존 위키 업데이트
 				const { error } = await supabase
 					.from("SongWiki")
 					.update({
@@ -74,7 +86,6 @@ export function useWikiData(songId: string) {
 
 				if (error) throw error;
 			} else {
-				// 새 위키 생성
 				const { error } = await supabase.from("SongWiki").insert({
 					song_id: songId,
 					created_by: currentUser.id,
@@ -84,7 +95,6 @@ export function useWikiData(songId: string) {
 				if (error) throw error;
 			}
 
-			// 데이터 다시 가져오기
 			await fetchWikiData();
 			return true;
 		} catch (error) {

@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 
-export async function GET({ params }: { params: { id: string } }) {
+type ArtiestType = {
+	external_urls: object;
+	href: string;
+	id: string;
+	name: string;
+	type: string;
+	uri: string;
+};
+
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const trackId = params.id;
+		const { id: trackId } = await params;
 
 		if (!trackId) {
 			return NextResponse.json({ error: "Track ID is required" }, { status: 400 });
@@ -49,7 +58,7 @@ export async function GET({ params }: { params: { id: string } }) {
 		const formattedTrack = {
 			id: trackData.id,
 			name: trackData.name,
-			artists: trackData.artists.map((artist: any) => ({
+			artists: trackData.artists.map((artist: ArtiestType) => ({
 				id: artist.id,
 				name: artist.name,
 			})),

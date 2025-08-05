@@ -1,3 +1,4 @@
+import type { User } from "@supabase/supabase-js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -8,7 +9,7 @@ import { generateDefaultWikiContent } from "../utils";
 interface WikiContentProps {
 	wikiData: WikiData | null;
 	trackData: SpotifyTrack | null;
-	currentUser: any;
+	currentUser: User | null;
 	onStartEditing: (content: string) => void;
 }
 

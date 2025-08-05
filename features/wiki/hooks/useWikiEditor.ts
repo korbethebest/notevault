@@ -1,11 +1,12 @@
+import type { User } from "@supabase/supabase-js";
 import { useState } from "react";
 
 import type { WikiData } from "../types";
 
 interface UseWikiEditorProps {
 	wikiData: WikiData | null;
-	saveWikiData: (content: string, currentUser: any) => Promise<boolean>;
-	currentUser: any;
+	saveWikiData: (content: string, currentUser: User | null) => Promise<boolean>;
+	currentUser: User | null;
 }
 
 export function useWikiEditor({ wikiData, saveWikiData, currentUser }: UseWikiEditorProps) {

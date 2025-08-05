@@ -5,7 +5,10 @@ export type WikiData = {
 	content: string;
 	created_at: string;
 	updated_at: string;
-	user_nickname?: string;
+};
+
+export type WikiDataWithNickname = WikiData & {
+	nickname: string;
 };
 
 export type TrackDisplayInfo = {
