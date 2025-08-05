@@ -37,7 +37,7 @@ function SongWiki({ songId }: SongWikiProps) {
 					<div className="flex items-center gap-4">
 						<button
 							onClick={() => router.back()}
-							className="text-zinc-400 hover:text-white transition-colors"
+							className="text-zinc-400 hover:text-white transition-colors cursor-pointer"
 							title="뒤로 가기"
 						>
 							<svg

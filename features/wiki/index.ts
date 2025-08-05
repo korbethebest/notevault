@@ -1,2 +1,2 @@
-export { useUserWiki } from "./hooks";
-export { ProfileWikiCard, SongWiki } from "./ui";
+export { useUserWiki, useWikiList } from "./hooks";
+export { ProfileWikiCard, SongWiki, WikiList } from "./ui";

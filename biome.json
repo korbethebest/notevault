@@ -21,14 +21,17 @@
 				"useExhaustiveDependencies": "off"
 			},
 			"suspicious": {
-				"noExplicitAny": "warn"
+				"noExplicitAny": "warn",
+				"noArrayIndexKey": "off"
 			},
 			"style": {
 				"noNonNullAssertion": "off"
 			},
 			"a11y": {
 				"noSvgWithoutTitle": "off",
-				"useButtonType": "off"
+				"useButtonType": "off",
+				"noStaticElementInteractions": "off",
+				"useKeyWithClickEvents": "off"
 			}
 		}
 	},

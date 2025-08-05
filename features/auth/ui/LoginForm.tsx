@@ -124,7 +124,7 @@ function LoginForm() {
 
 					<button
 						onClick={handleLogin}
-						className="w-full rounded-md transition-colors flex items-center justify-center bg-[#1DB954] text-black gap-2 hover:bg-[#1ed760] font-medium text-base h-12 px-6 mt-6"
+						className="w-full rounded-md transition-colors flex items-center justify-center bg-[#1DB954] text-black gap-2 hover:bg-[#1ed760] font-medium text-base h-12 px-6 mt-6 cursor-pointer"
 					>
 						로그인
 					</button>

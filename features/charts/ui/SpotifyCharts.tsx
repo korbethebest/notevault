@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import type { SpotifyTrack } from "@/entities/track";
 import { useSpotifyCharts } from "../hooks";
@@ -11,10 +12,21 @@ type TrackItemProps = {
 };
 
 function TrackItem({ track, rank }: TrackItemProps) {
+	const router = useRouter();
 	const albumImage = track.album.images.find((img) => img.height >= 64) || track.album.images[0];
 
+	const handleTrackClick = (e: React.MouseEvent) => {
+		if ((e.target as HTMLElement).closest('a[href*="spotify.com"]')) {
+			return;
+		}
+		router.push(`/song/${track.id}`);
+	};
+
 	return (
-		<div className="flex items-center gap-3 p-3 hover:bg-zinc-800 rounded-lg transition-colors">
+		<div
+			className="flex items-center gap-3 p-3 hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+			onClick={handleTrackClick}
+		>
 			<div className="text-zinc-400 font-mono text-sm w-6 text-right">{rank}</div>
 
 			{albumImage && (
@@ -39,8 +51,9 @@ function TrackItem({ track, rank }: TrackItemProps) {
 				href={track.external_urls.spotify}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="text-[#1DB954] hover:text-[#1ed760] transition-colors p-2"
+				className="text-[#1DB954] hover:text-[#1ed760] transition-colors p-2 z-10"
 				title="Spotify에서 듣기"
+				onClick={(e) => e.stopPropagation()}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
