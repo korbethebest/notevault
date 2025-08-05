@@ -24,25 +24,23 @@ function CommunityPostCard({ post }: CommunityPostCardProps) {
 			<div className="bg-zinc-900 rounded-lg p-6 hover:bg-zinc-800 transition-colors cursor-pointer">
 				{/* 작성자 정보 */}
 				<div className="flex items-center gap-3 mb-4">
-					<div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden">
-						{post.author?.avatar_url ? (
-							<div className="relative w-full h-full">
-								<Image
-									src={post.author.avatar_url}
-									alt={post.author.nickname}
-									fill
-									className="object-cover"
-								/>
-							</div>
+					<div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden relative">
+						{post.User?.avatar_url ? (
+							<Image
+								src={post.User.avatar_url}
+								alt={post.User.nickname}
+								fill
+								className="object-cover rounded-full"
+							/>
 						) : (
 							<span className="text-zinc-300 text-sm font-medium">
-								{post.author?.nickname?.[0] || "U"}
+								{post.User?.nickname?.[0] || "U"}
 							</span>
 						)}
 					</div>
 					<div>
 						<p className="text-zinc-300 font-medium text-sm">
-							{post.author?.nickname || "익명의 음악 애호가"}
+							{post.User?.nickname || "익명의 음악 애호가"}
 						</p>
 						<p className="text-zinc-500 text-xs">{formatDate(post.created_at)}</p>
 					</div>

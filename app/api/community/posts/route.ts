@@ -16,15 +16,15 @@ export async function GET(request: NextRequest) {
 			.from("CommunityPost")
 			.select(`
 				*,
-				author:User!CommunityPost_user_id_fkey (
-				  nickname,
-				  avatar_url
+				User(
+					nickname,
+					avatar_url
 				),
-				song:Song!CommunityPost_song_id_fkey (
-				  title,
-				  artist,
-				  album,
-				  cover_image_url
+				Song(
+					title,
+					artist,
+					album,
+					cover_image_url
 				)
 			  `)
 			.order("created_at", { ascending: false })
@@ -111,15 +111,27 @@ export async function GET(request: NextRequest) {
 					.select("*", { count: "exact", head: true })
 					.eq("post_id", post.id);
 
-				return {
+				// 사용자 정보 디버깅
+				console.log(`Post ${post.id} - Raw post data:`, JSON.stringify(post, null, 2));
+				console.log(`Post ${post.id} - User data:`, post.User || post.author);
+				console.log(
+					`Post ${post.id} - Avatar URL:`,
+					post.User?.avatar_url || post.author?.avatar_url,
+				);
+
+				// 데이터 구조 정리
+				const processedPost = {
 					...post,
-					author: post.User || null,
-					song: post.Song || null,
+					User: post.User || post.author, // 두 가지 가능성 모두 사용
+					author: post.author || post.User, // 두 가지 가능성 모두 사용
+					song: post.song || post.Song,
 					comments_count: commentsCount || 0,
 				};
+
+				return processedPost;
 			}),
 		);
-		console.log("Posts with details:", postsWithDetails);
+		console.log("Posts with details (first post):", JSON.stringify(postsWithDetails[0], null, 2));
 
 		return NextResponse.json({ posts: postsWithDetails });
 	} catch (error) {

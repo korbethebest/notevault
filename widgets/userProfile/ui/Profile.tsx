@@ -1,31 +1,53 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import type { User } from "@/entities/user";
 import { ProfileWikiCard, useUserWiki } from "@/features/wiki";
-import { useAuth } from "@/shared";
+import { supabase, useAuth } from "@/shared";
+import AvatarUpload from "./AvatarUpload";
 
 export default function Profile() {
 	const { user: authUser } = useAuth();
 	const [userProfile, setUserProfile] = useState<User | null>(null);
-	const [imageError, setImageError] = useState(false);
 	const { wikis, loading: wikisLoading, error } = useUserWiki(authUser?.id || "");
 
-	// Convert Supabase User to our User type and fetch additional profile data
 	useEffect(() => {
 		if (authUser) {
-			// For now, create a basic profile from auth user
-			// In a real app, you might fetch additional profile data from your User table
-			const profile: User = {
+			// 기본 프로필 정보 설정
+			const basicProfile: User = {
 				id: authUser.id,
 				email: authUser.email || "Unknown",
 				nickname: authUser.user_metadata?.nickname || authUser.email?.split("@")[0] || "User",
-				role: "user", // You might want to fetch this from your database
-				avatar_url: authUser.user_metadata?.avatar_url || null,
+				role: "user",
+				avatar_url: undefined,
 			};
-			setUserProfile(profile);
+
+			// User 테이블에서 추가 정보 가져오기
+			const fetchUserProfile = async () => {
+				try {
+					const { data, error } = await supabase
+						.from("User")
+						.select("nickname, avatar_url, role")
+						.eq("id", authUser.id)
+						.single();
+
+					if (error) throw error;
+
+					// User 테이블 정보로 프로필 업데이트
+					setUserProfile({
+						...basicProfile,
+						nickname: data.nickname || basicProfile.nickname,
+						avatar_url: data.avatar_url || basicProfile.avatar_url,
+						role: data.role || basicProfile.role,
+					});
+				} catch (error) {
+					console.error("프로필 정보 가져오기 오류:", error);
+					setUserProfile(basicProfile); // 오류 시 기본 정보만 사용
+				}
+			};
+
+			fetchUserProfile();
 		}
 	}, [authUser]);
 
@@ -66,36 +88,16 @@ export default function Profile() {
 				<div className="bg-zinc-900 rounded-xl p-6 mb-8">
 					<div className="flex items-center space-x-6">
 						{/* 프로필 이미지 */}
-						<div className="relative w-24 h-24">
-							{!imageError && userProfile.avatar_url ? (
-								<Image
-									src={userProfile.avatar_url}
-									alt={userProfile.nickname}
-									width={96}
-									height={96}
-									className="w-full h-full object-cover rounded-full"
-									onError={() => setImageError(true)}
-								/>
-							) : (
-								<div className="w-full h-full bg-zinc-700 rounded-full flex items-center justify-center">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="48"
-										height="48"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										className="text-zinc-400"
-									>
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-										<circle cx="12" cy="7" r="4" />
-									</svg>
-								</div>
-							)}
-						</div>
+						<AvatarUpload
+							currentAvatarUrl={userProfile.avatar_url}
+							userId={userProfile.id}
+							nickname={userProfile.nickname}
+							onAvatarUpdate={(newAvatarUrl) => {
+								setUserProfile((prev) =>
+									prev ? { ...prev, avatar_url: newAvatarUrl || undefined } : null,
+								);
+							}}
+						/>
 
 						{/* 사용자 정보 */}
 						<div className="flex-1">
