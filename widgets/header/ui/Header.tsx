@@ -15,23 +15,22 @@ function Header() {
 	useEffect(() => {
 		const fetchUserProfile = async () => {
 			try {
-				// 현재 로그인된 사용자 정보 가져오기
 				const {
 					data: { user },
 				} = await supabase.auth.getUser();
 
 				if (user) {
-					// User 테이블에서 닉네임 정보 가져오기
 					const { data, error } = await supabase
 						.from("User")
 						.select("nickname")
 						.eq("id", user.id)
 						.single();
 
-					if (data && !error) {
+					if (data && !error && data.nickname) {
 						setNickname(data.nickname);
 					} else {
-						console.error("사용자 프로필 정보를 가져오는 중 오류 발생:", error);
+						const fallbackNickname = user.user_metadata?.nickname || user.email?.split("@")[0] || "사용자";
+						setNickname(fallbackNickname);
 					}
 				}
 			} catch (error) {
@@ -51,7 +50,6 @@ function Header() {
 				return;
 			}
 
-			console.log("로그아웃 성공");
 			router.push("/login");
 		} catch (error) {
 			console.error("로그아웃 처리 중 예외 발생:", error);
