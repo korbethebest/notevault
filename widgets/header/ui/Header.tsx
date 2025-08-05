@@ -38,6 +38,7 @@ function Header() {
 					}
 				} else {
 					setIsAuthenticated(false);
+					setNickname("");
 					if (pathname !== "/login" && pathname !== "/signup") {
 						router.push("/login");
 					}
@@ -45,14 +46,60 @@ function Header() {
 			} catch (error) {
 				console.error("사용자 정보 조회 중 예외 발생:", error);
 				setIsAuthenticated(false);
+				setNickname("");
 				if (pathname !== "/login" && pathname !== "/signup") {
 					router.push("/login");
 				}
 			}
 		};
 
+		// 초기 인증 상태 확인
 		checkAuthAndFetchProfile();
-	}, []);
+
+		// 인증 상태 변화 리스너 설정
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange(async (event, session) => {
+			if (event === "SIGNED_IN" && session?.user) {
+				// 로그인 시 즉시 인증 상태 업데이트
+				setIsAuthenticated(true);
+
+				// 사용자 닉네임 조회
+				try {
+					const { data, error } = await supabase
+						.from("User")
+						.select("nickname")
+						.eq("id", session.user.id)
+						.single();
+
+					if (data && !error && data.nickname) {
+						setNickname(data.nickname);
+					} else {
+						const fallbackNickname =
+							session.user.user_metadata?.nickname || session.user.email?.split("@")[0] || "사용자";
+						setNickname(fallbackNickname);
+					}
+				} catch (error) {
+					console.error("닉네임 조회 중 오류:", error);
+					const fallbackNickname =
+						session.user.user_metadata?.nickname || session.user.email?.split("@")[0] || "사용자";
+					setNickname(fallbackNickname);
+				}
+			} else if (event === "SIGNED_OUT") {
+				// 로그아웃 시 즉시 상태 업데이트
+				setIsAuthenticated(false);
+				setNickname("");
+				if (pathname !== "/login" && pathname !== "/signup") {
+					router.push("/login");
+				}
+			}
+		});
+
+		// 컴포넌트 언마운트 시 구독 해제
+		return () => {
+			subscription.unsubscribe();
+		};
+	}, [pathname, router]);
 
 	const handleLogout = async () => {
 		try {
