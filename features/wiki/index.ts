@@ -1,1 +1,2 @@
-export { SongWiki } from "./ui";
+export { useUserWiki } from "./hooks";
+export { ProfileWikiCard, SongWiki } from "./ui";
