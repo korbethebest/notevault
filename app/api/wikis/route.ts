@@ -39,51 +39,11 @@ type WikiWithTrack = WikiData & {
 	track: SpotifyTrack;
 };
 
-export function isSpotifyTrack(track: unknown): track is SpotifyTrack {
-	if (!isRecord(track)) return false;
-
-	// id, name
-	if (typeof track.id !== "string" || typeof track.name !== "string") {
-		return false;
-	}
-
-	// artists
-	if (!Array.isArray(track.artists)) return false;
-	if (
-		!track.artists.every(
-			(artist) =>
-				isRecord(artist) && typeof artist.id === "string" && typeof artist.name === "string",
-		)
-	)
-		return false;
-
-	// album
-	if (
-		!isRecord(track.album) ||
-		typeof track.album.name !== "string" ||
-		!Array.isArray(track.album.images) ||
-		!track.album.images.every(
-			(image) =>
-				isRecord(image) &&
-				typeof image.url === "string" &&
-				typeof image.width === "number" &&
-				typeof image.height === "number",
-		)
-	)
-		return false;
-
-	// external_urls
-	if (!isRecord(track.external_urls) || typeof track.external_urls.spotify !== "string")
-		return false;
-
-	return true;
-}
-
 function isRecord(val: unknown): val is Record<string, unknown> {
 	return typeof val === "object" && val !== null;
 }
 
-export function isValidSpotifyTrack(track: unknown): track is SpotifyTrack {
+function isValidSpotifyTrack(track: unknown): track is SpotifyTrack {
 	if (!isRecord(track)) return false;
 
 	if (
