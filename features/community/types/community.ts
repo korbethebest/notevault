@@ -1,4 +1,4 @@
-export interface CommunityPost {
+export type CommunityPost = {
 	id: string;
 	user_id: string;
 	song_id: string;
@@ -29,9 +29,9 @@ export interface CommunityPost {
 		album?: string;
 		cover_image_url?: string;
 	};
-}
+};
 
-export interface CommunityComment {
+export type CommunityComment = {
 	id: string;
 	post_id: string;
 	user_id: string;
@@ -43,4 +43,4 @@ export interface CommunityComment {
 		nickname: string;
 		avatar_url?: string;
 	};
-}
+};

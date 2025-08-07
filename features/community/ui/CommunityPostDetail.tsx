@@ -1,12 +1,23 @@
-import Image from "next/image";
+"use client";
 
+import Image from "next/image";
+import { useState } from "react";
 import type { CommunityPost } from "../types";
+import CommentForm from "./CommentForm";
+import CommentList from "./CommentList";
 
 type CommunityPostDetailProps = {
 	post: CommunityPost;
 };
 
 function CommunityPostDetail({ post }: CommunityPostDetailProps) {
+	const [commentsKey, setCommentsKey] = useState(0);
+
+	// 댓글이 추가되면 CommentList를 리프레시하기 위한 함수
+	const handleCommentAdded = () => {
+		setCommentsKey((prev) => prev + 1);
+	};
+
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
 		return date.toLocaleDateString("ko-KR", {
@@ -76,11 +87,9 @@ function CommunityPostDetail({ post }: CommunityPostDetailProps) {
 				<div className="whitespace-pre-wrap text-white leading-relaxed">{post.content}</div>
 			</div>
 
-			{/* 댓글 섹션 (향후 구현) */}
-			<div className="mt-8 pt-6 border-t border-zinc-700">
-				<h3 className="text-lg font-semibold text-white mb-4">댓글</h3>
-				<div className="text-zinc-400 text-center py-8">댓글 기능은 곧 추가될 예정입니다.</div>
-			</div>
+			{/* 댓글 섹션 */}
+			<CommentList key={commentsKey} postId={post.id} />
+			<CommentForm postId={post.id} onCommentAdded={handleCommentAdded} />
 		</div>
 	);
 }
