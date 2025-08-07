@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { Modal, ModalProvider } from "@/shared";
-import { Footer } from "@/widgets/footer";
+import { Footer, HelperIcons } from "@/widgets/footer";
 import { Header } from "@/widgets/header";
 
 const geistSans = Geist({
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 		images: ["/twitter-image"],
 	},
 	icons: {
-		icon: "/favicon.ico",
+		icon: "/icon-192.png",
 		apple: "/apple-touch-icon.png",
 	},
 	manifest: "/manifest.json",
@@ -75,6 +75,7 @@ export default function RootLayout({
 				<ModalProvider>
 					<Header />
 					{children}
+					<HelperIcons />
 					<Footer />
 					<Modal />
 				</ModalProvider>
