@@ -21,7 +21,6 @@ const useSpotifyCharts = () => {
 
 				if (data.success) {
 					setCharts(data.tracks);
-					console.log("Charts loaded:", data.tracks.length, "tracks");
 				} else {
 					throw new Error(data.error || "Failed to fetch global charts");
 				}

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(searchParams.get("limit") || "20");
 		const offset = parseInt(searchParams.get("offset") || "0");
 
-		const { data: initialPosts, error } = await supabase
+		const { data: posts, error } = await supabase
 			.from("CommunityPost")
 			.select(`
 				*,
@@ -31,75 +31,7 @@ export async function GET(request: NextRequest) {
 			.range(offset, offset + limit - 1);
 
 		if (error) {
-			console.error("커뮤니티 게시글 조회 오류:", error);
-			console.error("Error details:", JSON.stringify(error, null, 2));
 			return NextResponse.json({ error: "게시글을 가져올 수 없습니다" }, { status: 500 });
-		}
-
-		// User 테이블에 없는 사용자들을 자동으로 생성
-		let posts = initialPosts;
-		const uniqueUserIds = [...new Set((posts || []).map((post) => post.user_id))];
-		console.log("Unique user IDs found:", uniqueUserIds);
-
-		for (const userId of uniqueUserIds) {
-			const { data: userCheck, error: userError } = await supabase
-				.from("User")
-				.select("id, nickname, role")
-				.eq("id", userId)
-				.single();
-
-			console.log(`User check for ${userId}:`, { userCheck, userError });
-
-			if (userError && userError.code === "PGRST116") {
-				// 사용자가 존재하지 않으면 기본 사용자로 생성
-				console.log(`Creating missing user: ${userId}`);
-
-				// 이메일 중복 방지를 위해 유니크한 이메일 생성
-				const uniqueEmail = `user-${userId.substring(0, 8)}@notevault.temp`;
-
-				const { error: insertError } = await supabase.from("User").insert({
-					id: userId,
-					email: uniqueEmail,
-					nickname: userId === "temp-user-id" ? "음악 애호가" : "익명의 사용자",
-					role: "user",
-				});
-
-				if (insertError) {
-					console.error(`Failed to create user ${userId}:`, insertError);
-				} else {
-					console.log(`Successfully created user: ${userId}`);
-				}
-			} else if (userCheck) {
-				console.log(`User ${userId} already exists:`, userCheck.nickname);
-			}
-		}
-
-		// 사용자 생성 후 다시 데이터 가져오기
-		const { data: postsWithUsers, error: refetchError } = await supabase
-			.from("CommunityPost")
-			.select(`
-				*,
-				User(
-					nickname,
-					avatar_url
-				),
-				Song(
-					title,
-					artist,
-					album,
-					cover_image_url
-				)
-			`)
-			.order("created_at", { ascending: false })
-			.range(offset, offset + limit - 1);
-
-		if (refetchError) {
-			console.error("Refetch error:", refetchError);
-			// 원래 데이터 사용
-		} else {
-			console.log("Refetched posts with users:", postsWithUsers);
-			// 새로 가져온 데이터 사용
-			posts = postsWithUsers;
 		}
 
 		// 댓글 수 가져오기 및 데이터 구조 정리
@@ -110,14 +42,6 @@ export async function GET(request: NextRequest) {
 					.from("CommunityComment")
 					.select("*", { count: "exact", head: true })
 					.eq("post_id", post.id);
-
-				// 사용자 정보 디버깅
-				console.log(`Post ${post.id} - Raw post data:`, JSON.stringify(post, null, 2));
-				console.log(`Post ${post.id} - User data:`, post.User || post.author);
-				console.log(
-					`Post ${post.id} - Avatar URL:`,
-					post.User?.avatar_url || post.author?.avatar_url,
-				);
 
 				// 데이터 구조 정리
 				const processedPost = {
@@ -131,11 +55,10 @@ export async function GET(request: NextRequest) {
 				return processedPost;
 			}),
 		);
-		console.log("Posts with details (first post):", JSON.stringify(postsWithDetails[0], null, 2));
 
 		return NextResponse.json({ posts: postsWithDetails });
 	} catch (error) {
-		console.error("커뮤니티 게시글 목록 조회 중 오류:", error);
+		console.error("게시글 조회 중 오류:", error);
 		return NextResponse.json({ error: "서버 오류가 발생했습니다" }, { status: 500 });
 	}
 }

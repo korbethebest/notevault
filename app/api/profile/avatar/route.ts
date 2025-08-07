@@ -53,38 +53,21 @@ export async function POST(request: NextRequest) {
 			data: { publicUrl },
 		} = supabase.storage.from("avatars").getPublicUrl(filePath);
 
-		console.log("Generated publicUrl:", publicUrl);
-		console.log(
-			"Full storage path:",
-			`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${filePath}`,
-		);
-
 		// Ensure we have a valid URL by constructing it if needed
 		const fullAvatarUrl =
 			publicUrl ||
 			`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${filePath}`;
-		console.log("Final avatar URL to save:", fullAvatarUrl);
-
-		// Update user's avatar_url in the database
-		console.log("Updating User table for userId:", userId);
-		console.log("Setting avatar_url to:", fullAvatarUrl);
 
 		// 먼저 사용자 정보를 확인
-		const { data: userData, error: userError } = await supabase
-			.from("User")
-			.select("*")
-			.eq("id", userId)
-			.single();
+		const { error: userError } = await supabase.from("User").select("*").eq("id", userId).single();
 
 		if (userError) {
 			console.error("Error fetching user:", userError);
 			return NextResponse.json({ error: "Failed to find user" }, { status: 404 });
 		}
 
-		console.log("Current user data:", userData);
-
 		// 명시적으로 avatar_url 필드만 업데이트
-		const { data: updateData, error: updateError } = await supabase
+		const { error: updateError } = await supabase
 			.from("User")
 			.update({ avatar_url: fullAvatarUrl })
 			.eq("id", userId)
@@ -94,8 +77,6 @@ export async function POST(request: NextRequest) {
 			console.error("Database update error:", updateError);
 			return NextResponse.json({ error: "Failed to update user profile" }, { status: 500 });
 		}
-
-		console.log("Update result:", updateData);
 
 		return NextResponse.json({
 			success: true,

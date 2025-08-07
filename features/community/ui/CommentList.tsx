@@ -46,8 +46,6 @@ export default function CommentList({ postId }: CommentListProps) {
 		if (!user) return;
 
 		try {
-			console.log("Sending edit request:", { commentId, content, userId: user.id });
-
 			const response = await fetch(`/api/community/posts/${postId}/comments`, {
 				method: "PATCH",
 				headers: {
@@ -61,11 +59,8 @@ export default function CommentList({ postId }: CommentListProps) {
 				credentials: "include", // 쿠키 포함
 			});
 
-			console.log("Edit response status:", response.status);
-
 			if (response.ok) {
 				const data = await response.json();
-				console.log("Edit response data:", data);
 				// 수정된 댓글로 대체
 				setComments(comments.map((c) => (c.id === commentId ? data.comment : c)));
 				setEditingCommentId(null);

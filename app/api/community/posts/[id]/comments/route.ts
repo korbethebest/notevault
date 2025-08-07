@@ -28,10 +28,7 @@ type FormattedComment = CommentWithUser & {
 	};
 };
 
-export async function GET(
-	_request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const resolvedParams = await params;
 	const postId = resolvedParams.id;
 
@@ -244,7 +241,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 // 댓글 삭제 (DELETE)
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> },
+) {
 	const resolvedParams = await params;
 	const postId = resolvedParams.id;
 	if (!postId) {
