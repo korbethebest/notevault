@@ -1,10 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createRouteHandlerClient } from "@/libs";
 
 type UserInfo = {
 	nickname: string;
@@ -28,7 +23,7 @@ type FormattedComment = CommentWithUser & {
 	};
 };
 
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const resolvedParams = await params;
 	const postId = resolvedParams.id;
 
@@ -37,6 +32,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 	}
 
 	try {
+		const supabase = createRouteHandlerClient(request);
 		// 댓글 목록 조회
 		const { data: comments, error } = await supabase
 			.from("CommunityComment")
@@ -90,6 +86,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 	}
 
 	try {
+		const supabase = createRouteHandlerClient(request);
 		// 요청 본문 가져오기
 		const requestBody = await request.json();
 		const { content, userId } = requestBody;
@@ -151,8 +148,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 	}
 
 	try {
+		const supabase = createRouteHandlerClient(request);
 		const body = await request.json();
-
 		const { commentId, content, userId } = body;
 
 		if (!commentId) {
@@ -252,6 +249,7 @@ export async function DELETE(
 	}
 
 	try {
+		const supabase = createRouteHandlerClient(request);
 		// URL에서 댓글 ID와 사용자 ID 가져오기
 		const url = new URL(request.url);
 		const commentId = url.searchParams.get("commentId");

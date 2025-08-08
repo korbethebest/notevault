@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
+import { FavoritesProvider } from "@/features/favorites";
 import { Modal, ModalProvider } from "@/shared";
 import { Footer, HelperIcons } from "@/widgets/footer";
 import { Header } from "@/widgets/header";
@@ -73,11 +74,13 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ModalProvider>
-					<Header />
-					{children}
-					<HelperIcons />
-					<Footer />
-					<Modal />
+					<FavoritesProvider>
+						<Header />
+						{children}
+						<HelperIcons />
+						<Footer />
+						<Modal />
+					</FavoritesProvider>
 				</ModalProvider>
 			</body>
 		</html>

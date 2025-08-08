@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import useAuth from "../../../shared/model/useAuth";
+import useAuth from "../../../shared/hooks/useAuth";
 
 type CommentFormProps = {
 	postId: string;

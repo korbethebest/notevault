@@ -3,7 +3,7 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import useAuth from "../../../shared/model/useAuth";
+import useAuth from "../../../shared/hooks/useAuth";
 
 import type { CommunityComment } from "../types";
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { LoadingSkeleton, SongCard } from "@/entities/track";
+import { FavoriteButton } from "@/features/favorites";
 import { useSpotifySearch } from "../hooks";
 
 function SongSearch() {
@@ -140,7 +141,12 @@ function SongSearch() {
 										(key) => <LoadingSkeleton key={key} />,
 									)
 								: searchResults.map((track, index) => (
-										<SongCard key={track.id} track={track} rank={index + 1} />
+										<SongCard
+											key={track.id}
+											track={track}
+											rank={index + 1}
+											actions={<FavoriteButton songId={track.id} />}
+										/>
 									))}
 						</div>
 					</div>

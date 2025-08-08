@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-import { supabase, useModal } from "@/shared";
+import { createClientSupabaseClient } from "@/libs";
+import { useModal } from "@/shared";
 import { useLogin } from "../model";
 
 function LoginForm() {
@@ -29,7 +29,7 @@ function LoginForm() {
 					cancelText: "재전송",
 					onCancel: async () => {
 						// 확인 이메일 재전송 로직
-						const { error } = await supabase.auth.resend({
+						const { error } = await createClientSupabaseClient().auth.resend({
 							type: "signup",
 							email,
 						});

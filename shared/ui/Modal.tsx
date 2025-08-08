@@ -1,6 +1,6 @@
 "use client";
 
-import { useModal } from "../model";
+import { useModal } from "../hooks";
 
 const Modal: React.FC = () => {
 	const { modal, confirm, cancel } = useModal();

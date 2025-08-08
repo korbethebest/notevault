@@ -2,6 +2,7 @@
 
 import { LoadingSkeleton, SongCard } from "@/entities/track";
 import { useSpotifyCharts } from "@/features/charts";
+import { FavoriteButton } from "@/features/favorites";
 
 function SongsGrid() {
 	const { charts, loading, error } = useSpotifyCharts();
@@ -37,7 +38,12 @@ function SongsGrid() {
 								<LoadingSkeleton key={key} />
 							))
 						: charts.map((track, index) => (
-								<SongCard key={track.id} track={track} rank={index + 1} />
+								<SongCard
+									key={track.id}
+									track={track}
+									rank={index + 1}
+									actions={<FavoriteButton songId={track.id} />}
+								/>
 							))}
 				</div>
 

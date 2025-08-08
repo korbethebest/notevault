@@ -1,7 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-import { supabase } from "@/shared";
+import { createClientSupabaseClient } from "@/libs";
 
 export function useCurrentUser() {
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -12,7 +12,7 @@ export function useCurrentUser() {
 			try {
 				const {
 					data: { user },
-				} = await supabase.auth.getUser();
+				} = await createClientSupabaseClient().auth.getUser();
 				setCurrentUser(user);
 			} catch (error) {
 				console.error("사용자 정보 조회 오류:", error);
@@ -25,7 +25,7 @@ export function useCurrentUser() {
 
 		const {
 			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
+		} = createClientSupabaseClient().auth.onAuthStateChange((_event, session) => {
 			setCurrentUser(session?.user || null);
 		});
 

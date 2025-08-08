@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 
-import { supabase } from "@/shared/lib";
+import { createClientSupabaseClient } from "@/libs";
 
 function useLogin() {
 	const router = useRouter();
 
 	const login = async (email: string, password: string) => {
-		const { error } = await supabase.auth.signInWithPassword({
+		const { error } = await createClientSupabaseClient().auth.signInWithPassword({
 			email,
 			password,
 		});

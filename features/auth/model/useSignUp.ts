@@ -1,10 +1,10 @@
 "use client";
 
-import { supabase } from "@/shared/lib";
+import { createClientSupabaseClient } from "@/libs";
 
 function useSignUp() {
 	const signUp = async (email: string, password: string, nickname: string) => {
-		const { data: authData, error: authError } = await supabase.auth.signUp({
+		const { data: authData, error: authError } = await createClientSupabaseClient().auth.signUp({
 			email,
 			password,
 			options: {

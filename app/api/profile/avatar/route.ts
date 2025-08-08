@@ -1,13 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-
-const supabase = createClient(
-	process.env.NEXT_PUBLIC_SUPABASE_URL!,
-	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+import { createRouteHandlerClient } from "@/libs";
 
 export async function POST(request: NextRequest) {
 	try {
+		const supabase = createRouteHandlerClient(request);
 		const formData = await request.formData();
 		const file = formData.get("avatar") as File;
 		const userId = formData.get("userId") as string;
@@ -90,6 +86,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
 	try {
+		const supabase = createRouteHandlerClient(request);
 		const { searchParams } = new URL(request.url);
 		const userId = searchParams.get("userId");
 

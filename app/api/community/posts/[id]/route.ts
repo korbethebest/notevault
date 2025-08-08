@@ -1,12 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@/libs";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id: postId } = await params;
 
@@ -14,6 +9,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 			return NextResponse.json({ error: "게시글 ID가 필요합니다" }, { status: 400 });
 		}
 
+		const supabase = createRouteHandlerClient(request);
 		const { data: post, error } = await supabase
 			.from("CommunityPost")
 			.select(`

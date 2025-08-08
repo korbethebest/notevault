@@ -1,10 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createRouteHandlerClient } from "@/libs";
 
 type SpotifyTrack = {
 	id: string;
@@ -91,7 +86,7 @@ function convertToSpotifyTrack(song: SupabaseWikiResponse["Song"]): SpotifyTrack
 }
 
 export async function GET(
-	_request: NextRequest,
+	request: NextRequest,
 	{ params }: { params: Promise<{ userId: string }> },
 ) {
 	try {
@@ -101,6 +96,7 @@ export async function GET(
 			return NextResponse.json({ error: "User ID is required" }, { status: 400 });
 		}
 
+		const supabase = createRouteHandlerClient(request);
 		// Step 1: Query SongWiki with Song data only
 		const { data: wikis, error: wikisError } = await supabase
 			.from("SongWiki")

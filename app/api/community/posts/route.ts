@@ -1,10 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createRouteHandlerClient } from "@/libs";
 
 export async function GET(request: NextRequest) {
 	try {
@@ -12,6 +7,7 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(searchParams.get("limit") || "20");
 		const offset = parseInt(searchParams.get("offset") || "0");
 
+		const supabase = createRouteHandlerClient(request);
 		const { data: posts, error } = await supabase
 			.from("CommunityPost")
 			.select(`
@@ -72,6 +68,7 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "모든 필드를 입력해주세요" }, { status: 400 });
 		}
 
+		const supabase = createRouteHandlerClient(request);
 		const { data: existingUser } = await supabase
 			.from("User")
 			.select("id")

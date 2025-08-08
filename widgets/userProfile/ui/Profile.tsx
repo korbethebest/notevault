@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 
 import type { User } from "@/entities/user";
+import { FavoritesList } from "@/features/favorites";
 import { ProfileWikiCard, useUserWiki } from "@/features/wiki";
-import { supabase, useAuth } from "@/shared";
+import { createClientSupabaseClient } from "@/libs";
+import { useAuth } from "@/shared";
 import AvatarUpload from "./AvatarUpload";
 
 export default function Profile() {
@@ -26,7 +28,7 @@ export default function Profile() {
 			// User 테이블에서 추가 정보 가져오기
 			const fetchUserProfile = async () => {
 				try {
-					const { data, error } = await supabase
+					const { data, error } = await createClientSupabaseClient()
 						.from("User")
 						.select("nickname, avatar_url, role")
 						.eq("id", authUser.id)
@@ -51,34 +53,8 @@ export default function Profile() {
 		}
 	}, [authUser]);
 
-	// Show loading state while auth is loading
-	if (!authUser && !userProfile) {
-		return (
-			<div className="min-h-screen bg-black text-white flex items-center justify-center">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-					<p className="text-zinc-400">로그인 정보를 확인하는 중...</p>
-				</div>
-			</div>
-		);
-	}
-
-	// Show login required state
 	if (!authUser || !userProfile) {
-		return (
-			<div className="min-h-screen bg-black text-white flex items-center justify-center">
-				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">로그인이 필요합니다</h1>
-					<p className="text-zinc-400 mb-6">프로필을 보려면 먼저 로그인해주세요.</p>
-					<a
-						href="/login"
-						className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-					>
-						로그인하기
-					</a>
-				</div>
-			</div>
-		);
+		return <div className="min-h-screen bg-black" />;
 	}
 
 	return (
@@ -168,6 +144,11 @@ export default function Profile() {
 							))}
 						</div>
 					)}
+				</div>
+
+				{/* 좋아하는 곡 섹션 */}
+				<div className="mb-8">
+					<FavoritesList />
 				</div>
 
 				{/* 통계 섹션 */}

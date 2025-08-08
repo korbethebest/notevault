@@ -1,4 +1,3 @@
-export { supabase } from "./lib";
-export { useAuth, useModal } from "./model";
+export { useAuth, useModal } from "./hooks";
 export { ModalProvider } from "./provider";
 export { Modal } from "./ui";

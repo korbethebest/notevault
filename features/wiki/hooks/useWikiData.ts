@@ -1,7 +1,8 @@
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+
 import type { SpotifyTrack } from "@/entities/track";
-import { supabase } from "@/shared";
+import { createClientSupabaseClient } from "@/libs";
 import type { WikiDataWithNickname } from "../types";
 
 type SupabaseWikiResponse = {
@@ -33,7 +34,7 @@ export function useWikiData(songId: string) {
 		setError(null);
 
 		try {
-			const { data, error: supabaseError } = await supabase
+			const { data, error: supabaseError } = await createClientSupabaseClient()
 				.from("SongWiki")
 				.select(
 					`
@@ -95,7 +96,7 @@ export function useWikiData(songId: string) {
 
 		try {
 			if (wikiData) {
-				const { error } = await supabase
+				const { error } = await createClientSupabaseClient()
 					.from("SongWiki")
 					.update({
 						content,
@@ -114,7 +115,7 @@ export function useWikiData(songId: string) {
 					cover_image_url: trackData?.album.images[0]?.url || null,
 				};
 
-				const { error: songUpsertError } = await supabase
+				const { error: songUpsertError } = await createClientSupabaseClient()
 					.from("Song")
 					.upsert(songData, { onConflict: "id" });
 
@@ -122,7 +123,7 @@ export function useWikiData(songId: string) {
 					throw songUpsertError;
 				}
 
-				const { error } = await supabase.from("SongWiki").insert({
+				const { error } = await createClientSupabaseClient().from("SongWiki").insert({
 					song_id: songId,
 					created_by: currentUser.id,
 					content,
