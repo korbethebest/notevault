@@ -2,11 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-	let response = NextResponse.next({
-		request: {
-			headers: request.headers,
-		},
-	});
+	const response = NextResponse.next();
 
 	const supabase = createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,27 +10,23 @@ export async function middleware(request: NextRequest) {
 		{
 			cookies: {
 				getAll() {
-					return request.cookies.getAll();
+					const cookieList = request.cookies.getAll();
+					return cookieList;
 				},
 				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value }) => {
-						request.cookies.set(name, value);
-					});
-					response = NextResponse.next({
-						request: {
-							headers: request.headers,
-						},
-					});
 					cookiesToSet.forEach(({ name, value, options }) => {
-						response.cookies.set(name, value, options);
+						response.cookies.set({
+							name,
+							value,
+							...options,
+						});
 					});
 				},
 			},
 		},
 	);
 
-	// Refresh session if expired - required for Server Components
-	await supabase.auth.getUser();
+	await supabase.auth.getSession();
 
 	return response;
 }

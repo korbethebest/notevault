@@ -6,17 +6,28 @@ import { useEffect, useState } from "react";
 import { createClientSupabaseClient } from "@/libs";
 
 function useAuth() {
-	const [user, setUser] = useState<User | null | undefined>(undefined); // 초기값을 undefined로 설정
+	const [user, setUser] = useState<User | null | undefined>(undefined);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const supabase = createClientSupabaseClient();
 
-		// 초기 사용자 상태 확인
-		supabase.auth.getUser().then(({ data }) => {
-			setUser(data.user);
-			setIsLoading(false);
-		});
+		const checkUser = async () => {
+			try {
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+
+				setUser(user);
+				setIsLoading(false);
+			} catch (error) {
+				console.error("Auth check error:", error);
+				setUser(null);
+				setIsLoading(false);
+			}
+		};
+
+		checkUser();
 
 		const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
 			setUser(session?.user ?? null);

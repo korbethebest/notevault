@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
 
 		// Create unique filename
 		const fileExt = file.name.split(".").pop();
-		const fileName = `${userId}-${Date.now()}.${fileExt}`;
-		const filePath = `avatars/${fileName}`;
+		const fileName = `${Date.now()}.${fileExt}`;
+		// Include userId as folder for RLS policy compatibility
+		const filePath = `avatars/${userId}/${fileName}`;
 
 		// Convert File to ArrayBuffer
 		const arrayBuffer = await file.arrayBuffer();
@@ -109,7 +110,7 @@ export async function DELETE(request: NextRequest) {
 		// Extract file path from URL if avatar exists
 		if (userData?.avatar_url) {
 			const url = new URL(userData.avatar_url);
-			const filePath = url.pathname.split("/").slice(-2).join("/"); // Get 'avatars/filename'
+			const filePath = url.pathname.split("/").slice(-3).join("/"); // Get 'avatars/userId/filename'
 
 			// Delete from storage
 			const { error: deleteError } = await supabase.storage.from("avatars").remove([filePath]);

@@ -12,7 +12,7 @@ function Header() {
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [nickname, setNickname] = useState<string>("");
-	const { user, isSignedIn } = useAuth();
+	const { user, isLoading, isSignedIn } = useAuth();
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -61,15 +61,19 @@ function Header() {
 		}
 	};
 
-	// 로그인/회원가입 페이지에서는 헤더 숨김
 	if (pathname === "/login" || pathname === "/signup") {
 		return null;
 	}
 
-	// 인증 상태 확인 중이거나 미인증 상태면 헤더 숨김
-	if (isSignedIn === null || isSignedIn === false) {
+	if (isLoading) {
+		return <div className="h-16 bg-black border-b border-zinc-800" />;
+	}
+
+	if (isSignedIn === null) {
 		return null;
 	}
+
+	console.log("Header rendering state:", { isSignedIn, user, nickname });
 
 	return (
 		<header className="bg-black text-white border-b border-zinc-800 sticky top-0 z-50">
