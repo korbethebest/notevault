@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { useAuth } from "@/shared";
 import { useFavorites } from "../model";
@@ -13,9 +13,14 @@ type FavoriteButtonProps = {
 function FavoriteButton({ songId, onFavoriteChange }: FavoriteButtonProps) {
 	const { user, isLoading: isAuthLoading, isSignedIn } = useAuth();
 	const { isFavorite, addFavorite, removeFavorite, isLoading: favoritesLoading } = useFavorites();
-	const [isLoading, setIsLoading] = useState(false);
-
+	const [isPending, startTransition] = useTransition();
+	const [isError, setIsError] = useState(false);
 	const currentIsFavorite = isFavorite(songId);
+	const [optimisticFavorite, setOptimisticFavorite] = useState(currentIsFavorite);
+
+	useEffect(() => {
+		setOptimisticFavorite(currentIsFavorite);
+	}, [currentIsFavorite]);
 
 	const toggleFavorite = async (e: React.MouseEvent) => {
 		if (!isSignedIn || !user) {
@@ -24,63 +29,49 @@ function FavoriteButton({ songId, onFavoriteChange }: FavoriteButtonProps) {
 		}
 
 		e.stopPropagation();
-		setIsLoading(true);
 
-		try {
-			let success = false;
+		startTransition(async () => {
+			const newFavoriteState = !optimisticFavorite;
+			setOptimisticFavorite(newFavoriteState);
+			setIsError(false);
+			try {
+				let success = false;
 
-			if (currentIsFavorite) {
-				success = await removeFavorite(songId);
-			} else {
-				success = await addFavorite(songId);
+				if (!newFavoriteState) {
+					success = await removeFavorite(songId);
+				} else {
+					success = await addFavorite(songId);
+				}
+
+				if (success) {
+					onFavoriteChange?.(songId, newFavoriteState);
+				} else {
+					setOptimisticFavorite(!newFavoriteState);
+					setIsError(true);
+					console.error("좋아요 상태 변경 실패");
+				}
+			} catch (error) {
+				setOptimisticFavorite(!newFavoriteState);
+				setIsError(true);
+				console.error("Error toggling favorite:", error);
 			}
-
-			if (success) {
-				onFavoriteChange?.(songId, !currentIsFavorite);
-			} else {
-				alert("오류가 발생했습니다.");
-			}
-		} catch (error) {
-			console.error("Error toggling favorite:", error);
-			alert("오류가 발생했습니다.");
-		} finally {
-			setIsLoading(false);
-		}
+		});
 	};
 
-	// 인증되지 않은 사용자에게는 버튼을 숨김 (단, 로딩 중에는 표시)
 	if (!isSignedIn && !isAuthLoading) {
 		return null;
 	}
 
 	return (
 		<button
-			className={`flex items-center justify-center p-2 rounded-full transition-all ${currentIsFavorite ? "text-red-500 hover:text-red-600" : "text-gray-400 hover:text-gray-300"}`}
+			className={`flex items-center justify-center p-2 rounded-full transition-all 
+			${optimisticFavorite ? "text-red-500 hover:text-red-600" : "text-gray-400 hover:text-gray-300"}
+			${isError ? "animate-shake" : ""}
+			${isPending ? "opacity-70" : ""}`}
 			onClick={toggleFavorite}
-			disabled={isLoading || isAuthLoading || favoritesLoading}
+			disabled={isAuthLoading || favoritesLoading}
 		>
-			{isLoading || favoritesLoading ? (
-				<svg
-					className="animate-spin h-5 w-5"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-				>
-					<circle
-						className="opacity-25"
-						cx="12"
-						cy="12"
-						r="10"
-						stroke="currentColor"
-						strokeWidth="4"
-					></circle>
-					<path
-						className="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					></path>
-				</svg>
-			) : currentIsFavorite ? (
+			{optimisticFavorite ? (
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					className="h-5 w-5"

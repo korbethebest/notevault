@@ -3,8 +3,8 @@
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import useAuth from "../../../shared/hooks/useAuth";
 
+import { useAuth } from "@/shared";
 import type { CommunityComment } from "../types";
 
 type CommentListProps = {
@@ -18,6 +18,7 @@ export default function CommentList({ postId }: CommentListProps) {
 	const [error, setError] = useState<string | null>(null);
 	const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 	const [editContent, setEditContent] = useState("");
+	const [editingLoading, setEditingLoading] = useState(false);
 
 	useEffect(() => {
 		const fetchComments = async () => {
@@ -45,6 +46,8 @@ export default function CommentList({ postId }: CommentListProps) {
 	const handleEditComment = async (commentId: string, content: string) => {
 		if (!user) return;
 
+		setEditingLoading(true);
+
 		try {
 			const response = await fetch(`/api/community/posts/${postId}/comments`, {
 				method: "PATCH",
@@ -56,7 +59,7 @@ export default function CommentList({ postId }: CommentListProps) {
 					content,
 					userId: user.id,
 				}),
-				credentials: "include", // 쿠키 포함
+				credentials: "include",
 			});
 
 			if (response.ok) {
@@ -78,6 +81,8 @@ export default function CommentList({ postId }: CommentListProps) {
 		} catch (err) {
 			console.error("댓글 수정 오류:", err);
 			alert("댓글 수정 중 오류가 발생했습니다");
+		} finally {
+			setEditingLoading(false);
 		}
 	};
 
@@ -221,15 +226,40 @@ export default function CommentList({ postId }: CommentListProps) {
 										<div className="flex justify-end mt-2 space-x-2">
 											<button
 												onClick={() => setEditingCommentId(null)}
-												className="px-3 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-md"
+												disabled={editingLoading}
+												className="px-3 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-md disabled:bg-zinc-800 disabled:cursor-not-allowed"
 											>
 												취소
 											</button>
 											<button
 												onClick={() => handleEditComment(comment.id, editContent)}
-												className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md"
+												disabled={editingLoading}
+												className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center justify-center min-w-[48px] disabled:bg-green-800 disabled:cursor-not-allowed"
 											>
-												저장
+												{editingLoading ? (
+													<svg
+														className="animate-spin h-3 w-3 text-white"
+														xmlns="http://www.w3.org/2000/svg"
+														fill="none"
+														viewBox="0 0 24 24"
+													>
+														<circle
+															className="opacity-25"
+															cx="12"
+															cy="12"
+															r="10"
+															stroke="currentColor"
+															strokeWidth="4"
+														></circle>
+														<path
+															className="opacity-75"
+															fill="currentColor"
+															d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+														></path>
+													</svg>
+												) : (
+													"저장"
+												)}
 											</button>
 										</div>
 									</div>
