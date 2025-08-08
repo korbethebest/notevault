@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { FavoritesProvider } from "@/features/favorites";
-import { Modal, ModalProvider } from "@/shared";
+import { AuthWrapper, Modal, ModalProvider } from "@/shared";
 import { Footer, HelperIcons } from "@/widgets/footer";
 import { Header } from "@/widgets/header";
 
@@ -75,11 +75,13 @@ export default function RootLayout({
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ModalProvider>
 					<FavoritesProvider>
-						<Header />
-						{children}
-						<HelperIcons />
-						<Footer />
-						<Modal />
+						<AuthWrapper>
+							<Header />
+							{children}
+							<HelperIcons />
+							<Footer />
+							<Modal />
+						</AuthWrapper>
 					</FavoritesProvider>
 				</ModalProvider>
 			</body>

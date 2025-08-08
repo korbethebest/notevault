@@ -61,19 +61,20 @@ function Header() {
 		}
 	};
 
+	// 로그인/회원가입 페이지에서는 헤더 숨김
 	if (pathname === "/login" || pathname === "/signup") {
 		return null;
 	}
 
+	// 로딩 중이면 로딩 표시
 	if (isLoading) {
 		return <div className="h-16 bg-black border-b border-zinc-800" />;
 	}
 
-	if (isSignedIn === null) {
+	// 인증되지 않은 상태면 헤더 숨김 (AuthWrapper에서 리다이렉션 처리)
+	if (!isSignedIn) {
 		return null;
 	}
-
-	console.log("Header rendering state:", { isSignedIn, user, nickname });
 
 	return (
 		<header className="bg-black text-white border-b border-zinc-800 sticky top-0 z-50">
@@ -167,7 +168,7 @@ function Header() {
 						</Link>
 						<button
 							onClick={handleLogout}
-							className="text-gray-300 hover:text-[#1DB954] px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+							className="text-gray-300 hover:text-[#1DB954] px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +217,7 @@ function Header() {
 						</Link>
 						<button
 							onClick={handleLogout}
-							className="text-gray-300 hover:text-[#1DB954] px-3 py-2 rounded-md text-base font-medium transition-colors w-full text-left flex items-center gap-2"
+							className="text-gray-300 hover:text-[#1DB954] px-3 py-2 rounded-md text-base font-medium transition-colors w-full text-left flex items-center gap-2 cursor-pointer"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

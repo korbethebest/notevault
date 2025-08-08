@@ -116,7 +116,8 @@ function FavoritesList() {
 								<Image
 									src={item.Song.cover_image_url}
 									alt={`${item.Song.title} 앨범 커버`}
-									fill
+									width={64}
+									height={64}
 									className="w-16 h-16 rounded-lg object-cover"
 								/>
 							) : (
