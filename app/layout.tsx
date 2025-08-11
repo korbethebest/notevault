@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 		siteName: "NoteVault",
 		images: [
 			{
-				url: "/opengraph-image",
+				url: "/NoteVaultThumbnail.png",
 				width: 1200,
 				height: 630,
 				alt: "NoteVault - 음악을 사랑하는 사람들의 공간",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "NoteVault - 음악을 사랑하는 사람들의 공간",
 		description: "음악을 사랑하는 사람들을 위한 공간. 다양한 음악 이야기를 나누세요.",
-		images: ["/twitter-image"],
+		images: ["/NoteVaultThumbnail.png"],
 	},
 	icons: {
 		icon: "/icon-192.png",
