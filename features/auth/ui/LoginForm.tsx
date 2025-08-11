@@ -1,19 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import { createClientSupabaseClient } from "@/libs";
 import { useModal } from "@/shared";
-import { useLogin } from "../model";
+import { useLogin } from "../hooks";
 
 function LoginForm() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const { login } = useLogin();
 	const { openModal } = useModal();
+
+	// URL 쿼리 파라미터에서 에러 메시지 확인
+	useEffect(() => {
+		const error = searchParams.get("error");
+		if (error) {
+			let errorMessage = "알 수 없는 오류가 발생했습니다.";
+
+			if (error === "unexpected_error") {
+				errorMessage = "예상치 못한 오류가 발생했습니다. 다시 시도해주세요.";
+			} else {
+				errorMessage = decodeURIComponent(error);
+			}
+
+			openModal({
+				type: "error",
+				title: "인증 오류",
+				message: errorMessage,
+				confirmText: "확인",
+			});
+
+			// URL에서 에러 파라미터 제거
+			router.replace("/login");
+		}
+	}, [searchParams, openModal, router]);
 
 	const handleLogin = async () => {
 		const { error } = await login(email, password);
@@ -32,6 +58,9 @@ function LoginForm() {
 						const { error } = await createClientSupabaseClient().auth.resend({
 							type: "signup",
 							email,
+							options: {
+								emailRedirectTo: `${window.location.origin}/auth/callback`,
+							},
 						});
 
 						if (error) {

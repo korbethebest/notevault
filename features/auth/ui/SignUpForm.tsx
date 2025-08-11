@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useModal } from "@/shared";
-import { useSignUp } from "../model";
+import { useSignUp } from "../hooks";
 
 function SignUpForm() {
 	const router = useRouter();

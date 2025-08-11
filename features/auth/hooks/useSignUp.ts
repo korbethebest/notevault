@@ -8,6 +8,7 @@ function useSignUp() {
 			email,
 			password,
 			options: {
+				emailRedirectTo: `${window.location.origin}/auth/callback`,
 				data: {
 					nickname: nickname,
 					avatar_url: "",
