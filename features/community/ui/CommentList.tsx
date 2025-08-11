@@ -168,9 +168,9 @@ export default function CommentList({ postId }: CommentListProps) {
 			) : (
 				<div className="space-y-6">
 					{comments.map((comment) => (
-						<div key={comment.id} className="flex space-x-3">
+						<div key={comment.id} className="flex space-x-2 sm:space-x-3">
 							<div className="flex-shrink-0">
-								<div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden relative">
+								<div className="w-7 h-7 sm:w-8 sm:h-8 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden relative">
 									{comment.author?.avatar_url ? (
 										<Image
 											src={comment.author.avatar_url}
@@ -179,40 +179,18 @@ export default function CommentList({ postId }: CommentListProps) {
 											className="object-cover rounded-full"
 										/>
 									) : (
-										<span className="text-zinc-300 text-sm font-medium">
+										<span className="text-zinc-300 text-xs sm:text-sm font-medium">
 											{comment.author?.nickname?.[0] || "U"}
 										</span>
 									)}
 								</div>
 							</div>
-							<div className="flex-1">
-								<div className="flex items-center mb-1">
-									<span className="text-sm font-medium text-white">
+							<div className="flex-1 min-w-0">
+								<div className="flex flex-wrap items-center gap-y-1 mb-1">
+									<span className="text-xs sm:text-sm font-medium text-white mr-2">
 										{comment.author?.nickname || "익명의 음악 애호가"}
 									</span>
-									<span className="text-xs text-zinc-500 ml-2">
-										{formatDate(comment.created_at)}
-									</span>
-
-									{/* 수정/삭제 버튼 (본인 댓글인 경우에만 표시) */}
-									{user && user.id === comment.user_id && (
-										<div className="ml-auto flex space-x-2">
-											<button
-												onClick={() => startEditing(comment)}
-												className="p-1 text-blue-400 hover:text-blue-300 rounded-full hover:bg-zinc-800 transition-colors"
-												title="댓글 수정"
-											>
-												<PencilIcon className="w-3.5 h-3.5" />
-											</button>
-											<button
-												onClick={() => handleDeleteComment(comment.id)}
-												className="p-1 text-red-400 hover:text-red-300 rounded-full hover:bg-zinc-800 transition-colors"
-												title="댓글 삭제"
-											>
-												<TrashIcon className="w-3.5 h-3.5" />
-											</button>
-										</div>
-									)}
+									<span className="text-xs text-zinc-500">{formatDate(comment.created_at)}</span>
 								</div>
 
 								{editingCommentId === comment.id ? (
@@ -220,21 +198,21 @@ export default function CommentList({ postId }: CommentListProps) {
 										<textarea
 											value={editContent}
 											onChange={(e) => setEditContent(e.target.value)}
-											className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent resize-none text-sm"
+											className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-transparent resize-none text-xs sm:text-sm"
 											rows={3}
 										/>
 										<div className="flex justify-end mt-2 space-x-2">
 											<button
 												onClick={() => setEditingCommentId(null)}
 												disabled={editingLoading}
-												className="px-3 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-md disabled:bg-zinc-800 disabled:cursor-not-allowed"
+												className="px-2 sm:px-3 py-1 text-xs bg-zinc-700 hover:bg-zinc-600 text-white rounded-md disabled:bg-zinc-800 disabled:cursor-not-allowed"
 											>
 												취소
 											</button>
 											<button
 												onClick={() => handleEditComment(comment.id, editContent)}
 												disabled={editingLoading}
-												className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center justify-center min-w-[48px] disabled:bg-green-800 disabled:cursor-not-allowed"
+												className="px-2 sm:px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center justify-center min-w-[40px] sm:min-w-[48px] disabled:bg-green-800 disabled:cursor-not-allowed"
 											>
 												{editingLoading ? (
 													<svg
@@ -264,7 +242,31 @@ export default function CommentList({ postId }: CommentListProps) {
 										</div>
 									</div>
 								) : (
-									<div className="text-zinc-300 text-sm whitespace-pre-wrap">{comment.content}</div>
+									<div className="relative">
+										<div className="text-zinc-300 text-xs sm:text-sm whitespace-pre-wrap break-words pb-6">
+											{comment.content}
+										</div>
+
+										{/* 수정/삭제 버튼 (본인 댓글인 경우에만 표시) */}
+										{user && user.id === comment.user_id && (
+											<div className="absolute bottom-0 right-0 flex space-x-1 sm:space-x-2">
+												<button
+													onClick={() => startEditing(comment)}
+													className="p-1 text-blue-400 hover:text-blue-300 rounded-full hover:bg-zinc-800 transition-colors"
+													title="댓글 수정"
+												>
+													<PencilIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+												</button>
+												<button
+													onClick={() => handleDeleteComment(comment.id)}
+													className="p-1 text-red-400 hover:text-red-300 rounded-full hover:bg-zinc-800 transition-colors"
+													title="댓글 삭제"
+												>
+													<TrashIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+												</button>
+											</div>
+										)}
+									</div>
 								)}
 							</div>
 						</div>

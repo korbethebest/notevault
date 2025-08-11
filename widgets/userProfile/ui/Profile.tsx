@@ -59,10 +59,10 @@ export default function Profile() {
 
 	return (
 		<div className="min-h-screen bg-black text-white">
-			<div className="container mx-auto px-4 py-8">
+			<div className="container mx-auto px-4 py-6 sm:py-8">
 				{/* 사용자 정보 섹션 */}
-				<div className="bg-zinc-900 rounded-xl p-6 mb-8">
-					<div className="flex items-center space-x-6">
+				<div className="bg-zinc-900 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
 						{/* 프로필 이미지 */}
 						<AvatarUpload
 							currentAvatarUrl={userProfile.avatar_url}
@@ -76,14 +76,20 @@ export default function Profile() {
 						/>
 
 						{/* 사용자 정보 */}
-						<div className="flex-1">
-							<h1 className="text-2xl font-bold text-white mb-2">{userProfile.nickname}</h1>
-							<p className="text-zinc-400 mb-1">{userProfile.email}</p>
-							<div className="flex items-center space-x-4">
+						<div className="flex-1 text-center sm:text-left">
+							<h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
+								{userProfile.nickname}
+							</h1>
+							<p className="text-zinc-400 mb-2 text-sm sm:text-base truncate">
+								{userProfile.email}
+							</p>
+							<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4">
 								<span className="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full">
 									{userProfile.role === "admin" ? "관리자" : "사용자"}
 								</span>
-								<span className="text-zinc-500 text-sm">기여한 위키: {wikis.length}개</span>
+								<span className="text-zinc-500 text-xs sm:text-sm">
+									기여한 위키: {wikis.length}개
+								</span>
 							</div>
 						</div>
 					</div>
@@ -91,7 +97,9 @@ export default function Profile() {
 
 				{/* 위키 섹션 */}
 				<div className="mb-6">
-					<h2 className="text-xl font-semibold text-white mb-4">내가 작성한 위키</h2>
+					<h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">
+						내가 작성한 위키
+					</h2>
 
 					{wikisLoading && (
 						<div className="flex justify-center items-center py-12">
@@ -106,19 +114,19 @@ export default function Profile() {
 					)}
 
 					{!wikisLoading && !error && wikis.length === 0 && (
-						<div className="bg-zinc-900 rounded-xl p-8 text-center">
-							<div className="text-zinc-400 mb-4">
+						<div className="bg-zinc-900 rounded-xl p-6 sm:p-8 text-center">
+							<div className="text-zinc-400 mb-3 sm:mb-4">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									width="48"
-									height="48"
+									width="40"
+									height="40"
 									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
 									strokeWidth="2"
 									strokeLinecap="round"
 									strokeLinejoin="round"
-									className="mx-auto mb-4"
+									className="mx-auto mb-3 sm:mb-4"
 								>
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 									<polyline points="14,2 14,8 20,8" />
@@ -127,13 +135,17 @@ export default function Profile() {
 									<polyline points="10,9 9,9 8,9" />
 								</svg>
 							</div>
-							<h3 className="text-lg font-medium text-white mb-2">아직 작성한 위키가 없습니다</h3>
-							<p className="text-zinc-400">좋아하는 곡에 대한 위키를 작성해보세요!</p>
+							<h3 className="text-base sm:text-lg font-medium text-white mb-1 sm:mb-2">
+								아직 작성한 위키가 없습니다
+							</h3>
+							<p className="text-zinc-400 text-sm sm:text-base">
+								좋아하는 곡에 대한 위키를 작성해보세요!
+							</p>
 						</div>
 					)}
 
 					{!wikisLoading && !error && wikis.length > 0 && (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 							{wikis.map((item, index) => (
 								<ProfileWikiCard
 									key={item.wiki.id}
@@ -147,27 +159,29 @@ export default function Profile() {
 				</div>
 
 				{/* 좋아하는 곡 섹션 */}
-				<div className="mb-8">
+				<div className="mb-6 sm:mb-8">
 					<FavoritesList />
 				</div>
 
 				{/* 통계 섹션 */}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-					<div className="bg-zinc-900 rounded-xl p-6 text-center">
-						<div className="text-2xl font-bold text-blue-400 mb-2">{wikis.length}</div>
-						<div className="text-zinc-400">작성한 위키</div>
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+					<div className="bg-zinc-900 rounded-xl p-4 sm:p-6 text-center">
+						<div className="text-xl sm:text-2xl font-bold text-blue-400 mb-1 sm:mb-2">
+							{wikis.length}
+						</div>
+						<div className="text-zinc-400 text-sm sm:text-base">작성한 위키</div>
 					</div>
-					<div className="bg-zinc-900 rounded-xl p-6 text-center">
-						<div className="text-2xl font-bold text-green-400 mb-2">
+					<div className="bg-zinc-900 rounded-xl p-4 sm:p-6 text-center">
+						<div className="text-xl sm:text-2xl font-bold text-green-400 mb-1 sm:mb-2">
 							{new Set(wikis.map((w) => w.track.artists[0]?.name)).size}
 						</div>
-						<div className="text-zinc-400">다룬 아티스트</div>
+						<div className="text-zinc-400 text-sm sm:text-base">다룬 아티스트</div>
 					</div>
-					<div className="bg-zinc-900 rounded-xl p-6 text-center">
-						<div className="text-2xl font-bold text-purple-400 mb-2">
+					<div className="bg-zinc-900 rounded-xl p-4 sm:p-6 text-center">
+						<div className="text-xl sm:text-2xl font-bold text-purple-400 mb-1 sm:mb-2">
 							{new Set(wikis.map((w) => w.track.album.name)).size}
 						</div>
-						<div className="text-zinc-400">다룬 앨범</div>
+						<div className="text-zinc-400 text-sm sm:text-base">다룬 앨범</div>
 					</div>
 				</div>
 			</div>

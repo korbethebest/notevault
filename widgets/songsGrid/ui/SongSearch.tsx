@@ -36,7 +36,7 @@ function SongSearch() {
 								type="text"
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								placeholder="예: BTS, 아이유, 뉴진스, 사랑노래..."
+								placeholder="예: BTS, 아이유, 사랑노래..."
 								className="w-full px-6 py-4 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-400 focus:outline-none focus:border-[#1DB954] focus:ring-2 focus:ring-[#1DB954]/20 transition-colors"
 								disabled={loading}
 							/>
@@ -66,7 +66,7 @@ function SongSearch() {
 								<button
 									type="submit"
 									disabled={loading || !searchQuery.trim()}
-									className="bg-[#1DB954] text-black px-4 py-2 rounded-lg font-medium hover:bg-[#1ed760] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+									className="bg-[#1DB954] text-black px-4 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
 								>
 									{loading ? (
 										<>
