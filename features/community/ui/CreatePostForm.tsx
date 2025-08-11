@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import type { SpotifyTrack } from "@/entities/track";
+
 type Song = {
 	id: string;
 	title: string;
@@ -45,7 +47,6 @@ function CreatePostForm() {
 			if (user) {
 				setUserId(user.id);
 
-				// User 테이블에서 실제 사용자 정보 가져오기
 				const { data: userData, error } = await supabase
 					.from("User")
 					.select("nickname, email")
@@ -53,14 +54,12 @@ function CreatePostForm() {
 					.single();
 
 				if (userData && !error) {
-					// User 테이블에서 가져온 데이터 사용
 					setUserInfo({
 						id: user.id,
 						email: userData.email || user.email || "",
 						nickname: userData.nickname || "익명의 음악 애호가",
 					});
 				} else {
-					// User 테이블에 데이터가 없으면 user_metadata 사용
 					const nickname = user.user_metadata?.nickname || "익명의 음악 애호가";
 					setUserInfo({
 						id: user.id,
@@ -83,10 +82,18 @@ function CreatePostForm() {
 
 		setIsSearching(true);
 		try {
-			const response = await fetch(`/api/songs/search?q=${encodeURIComponent(query)}`);
+			const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(query)}`);
 			if (response.ok) {
 				const data = await response.json();
-				setSearchResults(data.songs || []);
+				const songs =
+					data.tracks?.map((track: SpotifyTrack) => ({
+						id: track.id,
+						title: track.name,
+						artist: track.artists.map((artist) => artist.name).join(", "),
+						album: track.album.name,
+						cover_image_url: track.album.images[0]?.url || null,
+					})) || [];
+				setSearchResults(songs);
 			}
 		} catch (error) {
 			console.error("곡 검색 오류:", error);
