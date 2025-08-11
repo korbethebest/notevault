@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import type { SpotifyTrack } from "@/entities/track";
 import { useSpotifyCharts } from "../hooks";
@@ -73,9 +74,10 @@ interface ChartSectionProps {
 	title: string;
 	tracks: SpotifyTrack[];
 	loading: boolean;
+	chartType: "korea" | "billboard";
 }
 
-function ChartSection({ title, tracks, loading }: ChartSectionProps) {
+function ChartSection({ title, tracks, loading, chartType }: ChartSectionProps) {
 	if (loading) {
 		return (
 			<div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
@@ -101,7 +103,7 @@ function ChartSection({ title, tracks, loading }: ChartSectionProps) {
 			<h3 className="text-xl font-semibold mb-4 text-[#1DB954]">{title}</h3>
 			<div className="space-y-1 max-h-[600px] overflow-y-auto">
 				{tracks.map((track, index) => (
-					<TrackItem key={track.id} track={track} rank={index + 1} />
+					<TrackItem key={`${chartType}-${track.id}-${index}`} track={track} rank={index + 1} />
 				))}
 			</div>
 		</div>
@@ -109,7 +111,8 @@ function ChartSection({ title, tracks, loading }: ChartSectionProps) {
 }
 
 export default function SpotifyCharts() {
-	const { charts, loading, error } = useSpotifyCharts();
+	const [chartType, setChartType] = useState<"korea" | "billboard">("korea");
+	const { charts, loading, error } = useSpotifyCharts(chartType);
 
 	if (error) {
 		return (
@@ -125,12 +128,43 @@ export default function SpotifyCharts() {
 	return (
 		<div className="w-full space-y-8">
 			<div className="text-center">
-				<h2 className="text-2xl font-bold mb-2">🎵 국내 음악 차트</h2>
-				<p className="text-zinc-400">Spotify 국내 TOP 100 차트를 확인해보세요</p>
+				<h2 className="text-2xl font-bold mb-4">🎵 음악 차트</h2>
+				<p className="text-zinc-400 mb-6">Spotify TOP 100 차트를 확인해보세요</p>
+
+				{/* 차트 타입 토글 버튼 */}
+				<div className="flex justify-center mb-8">
+					<div className="flex bg-zinc-800 rounded-lg p-1 border border-zinc-700">
+						<button
+							onClick={() => setChartType("korea")}
+							className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+								chartType === "korea"
+									? "bg-[#1DB954] text-black shadow-lg"
+									: "text-zinc-400 hover:text-white hover:bg-zinc-700"
+							}`}
+						>
+							🇰🇷 국내 TOP 100
+						</button>
+						<button
+							onClick={() => setChartType("billboard")}
+							className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+								chartType === "billboard"
+									? "bg-[#1DB954] text-black shadow-lg"
+									: "text-zinc-400 hover:text-white hover:bg-zinc-700"
+							}`}
+						>
+							🇺🇸 Billboard TOP 100
+						</button>
+					</div>
+				</div>
 			</div>
 
 			<div className="max-w-4xl mx-auto">
-				<ChartSection title="🇰🇷 국내 TOP 100" tracks={charts} loading={loading} />
+				<ChartSection
+					title={chartType === "korea" ? "🇰🇷 국내 TOP 100" : "🇺🇸 Billboard TOP 100"}
+					tracks={charts}
+					loading={loading}
+					chartType={chartType}
+				/>
 			</div>
 		</div>
 	);

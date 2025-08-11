@@ -60,9 +60,14 @@ async function getSpotifyAccessToken(): Promise<string> {
 	return data.access_token;
 }
 
-async function getPopularTracks(accessToken: string): Promise<SpotifyTrack[]> {
-	// Spotify 국내 탑 100 플레이리스트 ID
-	const playlistId = "4cRo44TavIHN54w46OqRVc";
+async function getPopularTracks(
+	accessToken: string,
+	chartType: string = "korea",
+): Promise<SpotifyTrack[]> {
+	const koreaTop100PlaylistId = "4cRo44TavIHN54w46OqRVc";
+	const billboardTop100PlaylistId = "6UeSakyzhiEt4NB3UAd6NQ";
+
+	const playlistId = chartType === "billboard" ? billboardTop100PlaylistId : koreaTop100PlaylistId;
 	const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100&fields=items(track(id,name,artists(name),album(name,images),external_urls,preview_url))`;
 
 	const response = await fetch(url, {
@@ -91,7 +96,6 @@ async function getPopularTracks(accessToken: string): Promise<SpotifyTrack[]> {
 		return [];
 	}
 
-	// 플레이리스트 아이템에서 트랙 정보 추출
 	const tracks = data.items
 		.map((item: PlaylistTrack) => item.track)
 		.filter((track: SpotifyTrack) => track?.id && track?.name);
@@ -99,15 +103,18 @@ async function getPopularTracks(accessToken: string): Promise<SpotifyTrack[]> {
 	return tracks;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
 	try {
 		const accessToken = await getSpotifyAccessToken();
-		const tracks = await getPopularTracks(accessToken);
+		const { searchParams } = new URL(request.url);
+		const chartType = searchParams.get("type") || "korea";
+
+		const tracks = await getPopularTracks(accessToken, chartType);
 
 		return NextResponse.json({
 			success: true,
 			region: "korea",
-			tracks: tracks.slice(0, 100), // Top 100으로 제한
+			tracks: tracks.slice(0, 100),
 		});
 	} catch (error) {
 		return NextResponse.json(
